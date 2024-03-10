@@ -29,6 +29,7 @@ public class MyFavouritesViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        resetDataSource()
         viewModel?.getStackList(with: .voucher)
     }
     
@@ -103,6 +104,11 @@ public class MyFavouritesViewController: UIViewController {
                 }
             }
         }.store(in: &cancellables)
+    }
+    
+    private func resetDataSource() {
+        sections.removeAll()
+        dataSource?.dataSources?.removeAll()
     }
     
     // MARK: - Private TableView Configure Methods
