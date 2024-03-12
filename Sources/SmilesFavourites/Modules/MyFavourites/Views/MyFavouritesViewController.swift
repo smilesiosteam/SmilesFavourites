@@ -28,9 +28,8 @@ public class MyFavouritesViewController: UIViewController {
     // MARK: - Life Cycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        resetDataSource()
-        viewModel?.getStackList(with: .voucher)
+        resetTableViewDataSource()
+        viewModel?.getStackList(with: viewModel?.stackListType ?? .voucher)
     }
     
     public override func viewDidLoad() {
@@ -88,6 +87,9 @@ public class MyFavouritesViewController: UIViewController {
                 
             case .stackList(let response):
                 self.configureStackList(with: response)
+                
+            case .updateWishList(let response):
+                print(response)
             }
         }.store(in: &cancellables)
     }
@@ -101,12 +103,15 @@ public class MyFavouritesViewController: UIViewController {
                 self.segmentsCollectionView.reloadData()
                 if let stackListType = StackListType(rawValue: index) {
                     self.viewModel?.stackListType = stackListType
+                    
+                    self.resetTableViewDataSource()
+                    self.viewModel?.getStackList(with: stackListType)
                 }
             }
         }.store(in: &cancellables)
     }
     
-    private func resetDataSource() {
+    private func resetTableViewDataSource() {
         sections.removeAll()
         dataSource?.dataSources?.removeAll()
     }
@@ -114,7 +119,7 @@ public class MyFavouritesViewController: UIViewController {
     // MARK: - Private TableView Configure Methods
     private func configureStackList(with response: FavouriteStackListResponse) {
         if let stackList = response.stackList, !stackList.isEmpty {
-            let viewModel = FavouritesStackListTableViewCell.ViewModel(iconImage: .favouritesEmptyIcon, title: SmilesFavouritesLocalization.favouriteListEmptyMessage.text, message: SmilesFavouritesLocalization.swipeStackListMessage.text, badgeCount: 0, swipeCards: stackList, stackListType: viewModel?.stackListType ?? .voucher)
+            let viewModel = FavouritesStackListTableViewCell.ViewModel(iconImage: .favouritesEmptyIcon, title: SmilesFavouritesLocalization.favouriteListEmptyMessage.text, message: SmilesFavouritesLocalization.swipeStackListMessage.text, badgeCount: 0, swipeCards: stackList, stackListType: viewModel?.stackListType ?? .voucher, delegate: self)
             let dataSource = TableViewDataSource.make(forStackList: response, viewModel: viewModel, data: "#FFFFFF")
             self.dataSource?.dataSources?.append(dataSource)
             sections.append(TableSectionData(index: 0, identifier: .stackList))
@@ -129,5 +134,14 @@ extension MyFavouritesViewController {
     static public func create() -> MyFavouritesViewController {
         let viewController = MyFavouritesViewController(nibName: String(describing: MyFavouritesViewController.self), bundle: .module)
         return viewController
+    }
+}
+
+// MARK: - FavouritesStackListTableViewCellDelegate
+extension MyFavouritesViewController: FavouritesStackListTableViewCellDelegate {
+    func didSwipeCard(with card: StackCard?, direction: CardSwipeDirection) {
+        if let card {
+            viewModel?.updateWishList(id: card.stackId ?? "", operation: direction.operation)
+        }
     }
 }

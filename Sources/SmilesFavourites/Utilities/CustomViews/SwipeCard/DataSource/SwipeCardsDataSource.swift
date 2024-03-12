@@ -15,6 +15,6 @@ protocol SwipeCardsDataSource {
 }
 
 protocol SwipeCardsDelegate {
-    func swipeDidEnd(on view: SwipeCardView)
+    func swipeDidEnd(on view: SwipeCardView, direction: CardSwipeDirection)
 }
 

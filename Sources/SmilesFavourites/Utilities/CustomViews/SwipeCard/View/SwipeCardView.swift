@@ -19,24 +19,25 @@ final class SwipeCardView : UIView {
     private let subtitleLabel = UILabel()
     private let pointsStackView = UIStackView()
     private let pointsImageView = UIImageView()
+    private let ratingLabel = UILabel()
     private let pointsTextStackView = UIStackView()
     private let pointsTextStackContainerView = UIView()
     private let pointsLabel = UILabel()
+    private let minimumOrderTitleLabel = UILabel()
     private let orLabel = UILabel()
     private let aedLabel = UILabel()
+    private let deliveryChargesTitleLabel = UILabel()
     
+    private var cardType: StackListType = .voucher
     var delegate: SwipeCardsDelegate?
-    
     var divisor: CGFloat = 0
-    
     var dataSource: StackCard? {
         didSet {
-            titleLabel.text = dataSource?.stackTitle
-            pointsImageView.image = UIImage(resource: .smileyIcon)
-            pointsLabel.text = "\(dataSource?.stackPointsValue ?? "0") \(SmilesFavouritesLocalization.pointsTitle.text)"
-            orLabel.text = SmilesFavouritesLocalization.orTitle.text
-            aedLabel.text = "\(dataSource?.stackDirhamValue ?? "0") \(SmilesFavouritesLocalization.aed.text)"
-            imageView.setImageWithUrlString(dataSource?.stackPartnerImage ?? "")
+            if cardType == .voucher {
+                setupVoucherCard()
+            } else {
+                setupFoodCard()
+            }
         }
     }
     
@@ -49,8 +50,11 @@ final class SwipeCardView : UIView {
         configureSubtitleLabelView()
         configurePointsImageView()
         configurePointsLabelView()
+        configureMinimumOrderTitleLabelView()
+        configureRatingLabel()
         configureOrLabelView()
         configureAEDLabelView()
+        configureDeliveryChargesTitleLabelView()
         configurePointsTextStackView()
         configurePointsStackView()
         configureTitleStackView()
@@ -80,6 +84,12 @@ final class SwipeCardView : UIView {
     func configureBackgroundColor(color: UIColor?) {
         if let color {
             swipeView.backgroundColor = color
+        }
+    }
+    
+    func configureCardType(type: StackListType?) {
+        if let type = type {
+            cardType = type
         }
     }
     
@@ -149,11 +159,25 @@ final class SwipeCardView : UIView {
         ])
     }
     
+    private func configureRatingLabel() {
+        ratingLabel.textColor = .black.withAlphaComponent(0.8)
+        ratingLabel.textAlignment = .natural
+        ratingLabel.fontTextStyle = .smilesHeadline5
+        ratingLabel.numberOfLines = 1
+    }
+    
     private func configurePointsLabelView() {
         pointsLabel.textColor = .black.withAlphaComponent(0.8)
         pointsLabel.textAlignment = .natural
         pointsLabel.fontTextStyle = .smilesHeadline5
         pointsLabel.numberOfLines = 1
+    }
+    
+    private func configureMinimumOrderTitleLabelView() {
+        minimumOrderTitleLabel.textColor = .black.withAlphaComponent(0.6)
+        minimumOrderTitleLabel.textAlignment = .natural
+        minimumOrderTitleLabel.fontTextStyle = .smilesBody3
+        minimumOrderTitleLabel.numberOfLines = 1
     }
     
     private func configureOrLabelView() {
@@ -171,6 +195,14 @@ final class SwipeCardView : UIView {
         aedLabel.lineBreakMode = .byTruncatingTail
     }
     
+    private func configureDeliveryChargesTitleLabelView() {
+        deliveryChargesTitleLabel.textColor = .black.withAlphaComponent(0.6)
+        deliveryChargesTitleLabel.textAlignment = .natural
+        deliveryChargesTitleLabel.fontTextStyle = .smilesBody3
+        deliveryChargesTitleLabel.numberOfLines = 1
+        deliveryChargesTitleLabel.lineBreakMode = .byTruncatingTail
+    }
+    
     private func configurePointsTextStackView() {
         pointsTextStackContainerView.addSubview(pointsTextStackView)
         
@@ -178,7 +210,7 @@ final class SwipeCardView : UIView {
         pointsTextStackView.alignment = .fill
         pointsTextStackView.distribution = .fill
         pointsTextStackView.spacing = 8
-        [pointsLabel, orLabel, aedLabel].forEach {
+        [pointsLabel, minimumOrderTitleLabel, orLabel, aedLabel, deliveryChargesTitleLabel].forEach {
             pointsTextStackView.addArrangedSubview($0)
         }
         
@@ -199,7 +231,7 @@ final class SwipeCardView : UIView {
         pointsStackView.alignment = .fill
         pointsStackView.distribution = .fill
         pointsStackView.spacing = 4
-        [pointsImageView, pointsTextStackContainerView].forEach {
+        [pointsImageView, ratingLabel, pointsTextStackContainerView].forEach {
             pointsStackView.addArrangedSubview($0)
         }
         
@@ -209,6 +241,86 @@ final class SwipeCardView : UIView {
             pointsStackView.trailingAnchor.constraint(equalTo: swipeView.trailingAnchor, constant: -16),
             pointsStackView.bottomAnchor.constraint(equalTo: swipeView.bottomAnchor, constant: -16)
         ])
+    }
+    
+    private func setupVoucherCard() {
+        titleLabel.text = dataSource?.stackTitle
+        pointsImageView.image = UIImage(resource: .smileyIcon)
+        pointsLabel.text = "\(dataSource?.stackPointsValue ?? "0") \(SmilesFavouritesLocalization.pointsTitle.text)"
+        orLabel.text = SmilesFavouritesLocalization.orTitle.text
+        aedLabel.text = "\(dataSource?.stackDirhamValue ?? "0") \(SmilesFavouritesLocalization.aed.text)"
+        imageView.setImageWithUrlString(dataSource?.stackPartnerImage ?? "")
+    }
+    
+    private func setupFoodCard() {
+        titleLabel.text = dataSource?.stackTitle
+        subtitleLabel.text = dataSource?.cuisine
+        if let rating = dataSource?.rating, rating > 0 {
+            pointsImageView.isHidden = false
+            ratingLabel.isHidden = false
+            pointsImageView.image = UIImage(resource: .starIcon)
+            let ratingText = String(format: "%.1f", rating)
+            ratingLabel.text = ratingText
+        } else {
+            pointsImageView.isHidden = true
+            ratingLabel.isHidden = true
+        }
+        
+        imageView.setImageWithUrlString(dataSource?.restaurantImage ?? "")
+        
+//        if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0, let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
+//            
+//            pointsLabel.isHidden = false
+//            minimumOrderTitleLabel.isHidden = false
+//            orLabel.isHidden = false
+//            aedLabel.isHidden = false
+//            deliveryChargesTitleLabel.isHidden = false
+//            
+//            pointsLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
+//            
+//            orLabel.text = "|"
+//            
+//            aedLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
+//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
+//        } else if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0 {
+//            
+//            pointsLabel.isHidden = false
+//            minimumOrderTitleLabel.isHidden = false
+//            orLabel.isHidden = false
+//            aedLabel.isHidden = true
+//            deliveryChargesTitleLabel.isHidden = false
+//            
+//            pointsLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
+//            
+//            orLabel.text = "|"
+//            
+//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+//        } else if let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
+//            
+//            pointsLabel.isHidden = true
+//            minimumOrderTitleLabel.isHidden = false
+//            orLabel.isHidden = false
+//            aedLabel.isHidden = false
+//            deliveryChargesTitleLabel.isHidden = false
+//            
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+//            
+//            orLabel.text = "|"
+//            
+//            aedLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
+//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
+//        } else {
+//            
+//            pointsLabel.isHidden = true
+//            minimumOrderTitleLabel.isHidden = false
+//            orLabel.isHidden = true
+//            aedLabel.isHidden = true
+//            deliveryChargesTitleLabel.isHidden = true
+//            
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+//        }
     }
     
     private func configureTapGesture() {
@@ -232,7 +344,7 @@ final class SwipeCardView : UIView {
         switch sender.state {
         case .ended:
             if (card.center.x) > 400 {
-                delegate?.swipeDidEnd(on: card)
+                delegate?.swipeDidEnd(on: card, direction: .right)
                 UIView.animate(withDuration: 0.2) {
                     card.center = CGPoint(x: centerOfParentContainer.x + point.x + 200, y: centerOfParentContainer.y + point.y + 75)
                     card.alpha = 0
@@ -240,7 +352,7 @@ final class SwipeCardView : UIView {
                 }
                 return
             } else if card.center.x < -65 {
-                delegate?.swipeDidEnd(on: card)
+                delegate?.swipeDidEnd(on: card, direction: .left)
                 UIView.animate(withDuration: 0.2) {
                     card.center = CGPoint(x: centerOfParentContainer.x + point.x - 200, y: centerOfParentContainer.y + point.y + 75)
                     card.alpha = 0

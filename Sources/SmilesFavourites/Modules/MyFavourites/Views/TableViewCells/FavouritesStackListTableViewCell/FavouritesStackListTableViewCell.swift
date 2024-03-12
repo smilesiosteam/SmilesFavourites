@@ -9,6 +9,10 @@ import UIKit
 import SmilesUtilities
 import SmilesFontsManager
 
+protocol FavouritesStackListTableViewCellDelegate: AnyObject {
+    func didSwipeCard(with card: StackCard?, direction: CardSwipeDirection)
+}
+
 final class FavouritesStackListTableViewCell: UITableViewCell {
     // MARK: - Outlets
     @IBOutlet private weak var containerStackView: UIStackView!
@@ -21,6 +25,7 @@ final class FavouritesStackListTableViewCell: UITableViewCell {
     @IBOutlet private weak var stackContainerView: UIView!
     
     // MARK: - Properties
+    weak var delegate: FavouritesStackListTableViewCellDelegate?
     private var stackContainer = StackContainerView()
     var swipeCards = [StackCard]()
     var stackListType: StackListType = .voucher
@@ -54,6 +59,7 @@ final class FavouritesStackListTableViewCell: UITableViewCell {
     }
     
     func configureCell(with viewModel: ViewModel) {
+        delegate = viewModel.delegate
         iconImageView.image = UIImage(resource: viewModel.iconImage ?? .favouritesEmptyIcon)
         titleLabel.text = viewModel.title
         messageLabel.text = viewModel.message
@@ -84,6 +90,7 @@ extension FavouritesStackListTableViewCell {
         let badgeCount: Int?
         let swipeCards: [StackCard]?
         let stackListType: StackListType
+        let delegate: FavouritesStackListTableViewCellDelegate?
     }
 }
 
@@ -94,6 +101,7 @@ extension FavouritesStackListTableViewCell: SwipeCardsDataSource {
     
     func card(at index: Int) -> SwipeCardView {
         let card = SwipeCardView()
+        card.configureCardType(type: stackListType)
         card.dataSource = swipeCards[index]
         return card
     }
@@ -104,5 +112,7 @@ extension FavouritesStackListTableViewCell: SwipeCardsDataSource {
 }
 
 extension FavouritesStackListTableViewCell: StackContainerDelegate {
-    func swipeDidEnd(on view: SwipeCardView) {}
+    func swipeDidEnd(on view: SwipeCardView, direction: CardSwipeDirection) {
+        delegate?.didSwipeCard(with: view.dataSource, direction: direction)
+    }
 }

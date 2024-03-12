@@ -11,7 +11,8 @@ import NetworkingLayer
 public enum MyFavouritesConfigurator {
     public static func getMyFavouritesView() -> MyFavouritesViewController {
         let stackListUseCase = StackListUseCase(repository: repository)
-        let viewModel = MyFavouritesViewModel(useCase: stackListUseCase)
+        let wishListUseCase = WishListUseCase()
+        let viewModel = MyFavouritesViewModel(stackListUseCase: stackListUseCase, wishListUseCase: wishListUseCase)
         let viewController = MyFavouritesViewController.create()
         viewController.viewModel = viewModel
         viewController.segmentCollectionViewDataSource = SegmentsCollectionViewDataSource(arraySegments: viewModel.arraySegments)

@@ -9,7 +9,7 @@
 import UIKit
 
 protocol StackContainerDelegate: AnyObject {
-    func swipeDidEnd(on view: SwipeCardView)
+    func swipeDidEnd(on view: SwipeCardView, direction: CardSwipeDirection)
 }
 
 final class StackContainerView: UIView, SwipeCardsDelegate {
@@ -88,7 +88,7 @@ final class StackContainerView: UIView, SwipeCardsDelegate {
         cardViews = []
     }
     
-    func swipeDidEnd(on view: SwipeCardView) {
+    func swipeDidEnd(on view: SwipeCardView, direction: CardSwipeDirection) {
         guard let datasource = dataSource else { return }
         view.removeFromSuperview()
         
@@ -114,7 +114,7 @@ final class StackContainerView: UIView, SwipeCardsDelegate {
             }
         }
         
-        delegate?.swipeDidEnd(on: view)
+        delegate?.swipeDidEnd(on: view, direction: direction)
     }
 }
 

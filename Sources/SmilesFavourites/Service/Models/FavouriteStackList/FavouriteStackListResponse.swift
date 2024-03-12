@@ -30,7 +30,12 @@ struct StackCard: Codable {
     let stackPointsValue: String?
     let stackDirhamValue: String?
     let stackPartnerImage: String?
-    var backgroundColor: UIColor?
+    let minimumOrder: String?
+    let cuisine: String?
+    let restaurantImage: String?
+    let deliveryCharges: Double?
+    let perPerson: Double?
+    let rating: Double?
     
     // MARK: - CodingKeys
     enum CodingKeys: String, CodingKey {
@@ -39,6 +44,12 @@ struct StackCard: Codable {
         case stackPointsValue
         case stackDirhamValue
         case stackPartnerImage
+        case minimumOrder = "minOrder"
+        case cuisine
+        case restaurantImage
+        case deliveryCharges
+        case perPerson
+        case rating
     }
     
     // MARK: - Lifecycle
@@ -49,5 +60,11 @@ struct StackCard: Codable {
         self.stackPointsValue = try container.decodeIfPresent(String.self, forKey: .stackPointsValue)
         self.stackDirhamValue = try container.decodeIfPresent(String.self, forKey: .stackDirhamValue)
         self.stackPartnerImage = try container.decodeIfPresent(String.self, forKey: .stackPartnerImage)
+        self.minimumOrder = try container.decodeIfPresent(String.self, forKey: .minimumOrder)
+        self.cuisine = try container.decodeIfPresent(String.self, forKey: .cuisine)
+        self.deliveryCharges = try container.decodeIfPresent(Double.self, forKey: .deliveryCharges)
+        self.perPerson = try container.decodeIfPresent(Double.self, forKey: .perPerson)
+        self.restaurantImage = try container.decodeIfPresent(String.self, forKey: .restaurantImage)
+        self.rating = try container.decodeIfPresent(Double.self, forKey: .rating)
     }
 }
