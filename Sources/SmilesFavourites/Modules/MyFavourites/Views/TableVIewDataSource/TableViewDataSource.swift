@@ -22,3 +22,35 @@ extension TableViewDataSource where Model == FavouriteStackListResponse {
         }
     }
 }
+
+extension TableViewDataSource where Model == OfferDO {
+    static func make(forFavouriteVoucher vouchers: [OfferDO], reuseIdentifier: String = String(describing: RestaurantsRevampTableViewCell.self), data: String, isDummy: Bool = false) -> TableViewDataSource {
+        return TableViewDataSource(
+            models: vouchers,
+            reuseIdentifier: reuseIdentifier,
+            data: data,
+            isDummy: isDummy
+        ) { (voucherData, cell, data, indexPath) in
+            guard let cell = cell as? RestaurantsRevampTableViewCell else { return }
+            cell.selectionStyle = .none
+            cell.offerCellType = .favourite
+            cell.configureCell(with: voucherData)
+        }
+    }
+}
+
+extension TableViewDataSource where Model == Restaurant {
+    static func make(forFavouriteFood foods: [Restaurant], reuseIdentifier: String = String(describing: RestaurantsRevampTableViewCell.self), data: String, isDummy: Bool = false) -> TableViewDataSource {
+        return TableViewDataSource(
+            models: foods,
+            reuseIdentifier: reuseIdentifier,
+            data: data,
+            isDummy: isDummy
+        ) { (foodData, cell, data, indexPath) in
+            guard let cell = cell as? RestaurantsRevampTableViewCell else { return }
+            cell.selectionStyle = .none
+            foodData.isFavoriteRestaurant = true
+            cell.configureCell(with: foodData)
+        }
+    }
+}

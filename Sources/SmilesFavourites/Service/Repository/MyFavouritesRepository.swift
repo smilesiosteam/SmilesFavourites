@@ -11,6 +11,8 @@ import NetworkingLayer
 
 protocol MyFavouritesServiceable {
     func getFavouriteStackListService(request: FavouriteStackListRequest) -> AnyPublisher<FavouriteStackListResponse, NetworkError>
+    func getFavouriteVoucher(request: FavouriteVoucherRequest) -> AnyPublisher<FavouriteVoucherResponse, NetworkError>
+    func getFavouriteFood(request: FavouriteFoodRequest) -> AnyPublisher<FavouriteFoodResponse, NetworkError>
 }
 
 final class MyFavouritesRepository: MyFavouritesServiceable {
@@ -27,6 +29,24 @@ final class MyFavouritesRepository: MyFavouritesServiceable {
         let endPoint = MyFavouritesRequestBuilder.getFavouriteStackList(request: request)
         let request = endPoint.createRequest(
             endPoint: .favouriteStackList
+        )
+
+        return networkRequest.request(request)
+    }
+    
+    func getFavouriteVoucher(request: FavouriteVoucherRequest) -> AnyPublisher<FavouriteVoucherResponse, NetworkError> {
+        let endPoint = MyFavouritesRequestBuilder.getFavourtieVoucher(request: request)
+        let request = endPoint.createRequest(
+            endPoint: .getFavourtieVoucher
+        )
+
+        return networkRequest.request(request)
+    }
+    
+    func getFavouriteFood(request: FavouriteFoodRequest) -> AnyPublisher<FavouriteFoodResponse, NetworkError> {
+        let endPoint = MyFavouritesRequestBuilder.getFavouriteFood(request: request)
+        let request = endPoint.createRequest(
+            endPoint: .getFavouriteRestaurantsEndPoint
         )
 
         return networkRequest.request(request)

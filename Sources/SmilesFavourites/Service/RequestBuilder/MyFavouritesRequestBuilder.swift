@@ -13,6 +13,8 @@ import SmilesUtilities
 enum MyFavouritesRequestBuilder {
     // organise all the end points here for clarity
     case getFavouriteStackList(request: FavouriteStackListRequest)
+    case getFavourtieVoucher(request: FavouriteVoucherRequest)
+    case getFavouriteFood(request: FavouriteFoodRequest)
     
     // gave a default timeout but can be different for each.
     var requestTimeOut: Int {
@@ -22,7 +24,7 @@ enum MyFavouritesRequestBuilder {
     //specify the type of HTTP request
     var httpMethod: SmilesHTTPMethod {
         switch self {
-        case .getFavouriteStackList:
+        case .getFavouriteStackList, .getFavourtieVoucher, .getFavouriteFood:
             return .POST
         }
     }
@@ -43,6 +45,10 @@ enum MyFavouritesRequestBuilder {
         switch self {
         case .getFavouriteStackList(let request):
             return request
+        case .getFavourtieVoucher(let request):
+            return request
+        case .getFavouriteFood(let request):
+            return request
         }
     }
     
@@ -52,6 +58,10 @@ enum MyFavouritesRequestBuilder {
         
         switch self {
         case .getFavouriteStackList:
+            return "\(baseUrl)\(endPoint)"
+        case .getFavourtieVoucher:
+            return "\(baseUrl)\(endPoint)"
+        case .getFavouriteFood:
             return "\(baseUrl)\(endPoint)"
         }
     }

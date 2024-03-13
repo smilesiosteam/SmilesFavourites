@@ -19,6 +19,7 @@ enum SmilesFavouritesLocalization {
     case minimumOrderTitle
     case deliveryChargesTitle
     case freeDeliveryTitle
+    case favourites
     
     var text: String {
         switch self {
@@ -42,6 +43,8 @@ enum SmilesFavouritesLocalization {
             return "DeliveryCharges".localizedString
         case .freeDeliveryTitle:
             return "FreeDeliveryText".localizedString
+        case .favourites:
+            return "Favourites".localizedString
         }
     }
 }

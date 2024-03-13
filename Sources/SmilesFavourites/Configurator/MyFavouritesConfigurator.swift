@@ -9,11 +9,14 @@ import Foundation
 import NetworkingLayer
 
 public enum MyFavouritesConfigurator {
-    public static func getMyFavouritesView() -> MyFavouritesViewController {
+    public static func getMyFavouritesView(delegate: MyFavouritesViewControllerDelegate?) -> MyFavouritesViewController {
         let stackListUseCase = StackListUseCase(repository: repository)
         let wishListUseCase = WishListUseCase()
-        let viewModel = MyFavouritesViewModel(stackListUseCase: stackListUseCase, wishListUseCase: wishListUseCase)
+        let favouriteVoucherUseCase = FavouriteVoucherUseCase(repository: repository)
+        let favouriteFoodUseCase = FavouriteFoodUseCase(repository: repository)
+        let viewModel = MyFavouritesViewModel(useCase: stackListUseCase, wishListUseCase: wishListUseCase, favouritesVoucherUseCase: favouriteVoucherUseCase, favouriteFoodUseCase: favouriteFoodUseCase)
         let viewController = MyFavouritesViewController.create()
+        viewController.delegate = delegate
         viewController.viewModel = viewModel
         viewController.segmentCollectionViewDataSource = SegmentsCollectionViewDataSource(arraySegments: viewModel.arraySegments)
         viewController.tableViewDelegate = MyFavouritesTableViewDelegate()

@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Muhammad Shayan Zahid on 07/03/2024.
 //
@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 import SmilesSharedServices
+import SmilesLocationHandler
+import CoreLocation
 
 final class MyFavouritesViewModel {
     // MARK: - Properties
@@ -19,13 +21,19 @@ final class MyFavouritesViewModel {
     
     private let stackListUseCase: StackListUseCaseProtocol
     private let wishListUseCase: WishListUseCaseProtocol
+    private let favouritesVoucherUseCase: FavouriteVoucherUseCase
+    private let favouritesFoodUseCase: FavouriteFoodUseCase
     let arraySegments = [SmilesFavouritesLocalization.vouchersTitle.text, SmilesFavouritesLocalization.foodTitle.text]
     var stackListType: StackListType = .voucher
+    var pageNumber = 1
+    
     
     // MARK: - Init
-    init(stackListUseCase: StackListUseCaseProtocol, wishListUseCase: WishListUseCaseProtocol) {
-        self.stackListUseCase = stackListUseCase
+    init(useCase: StackListUseCaseProtocol, wishListUseCase: WishListUseCaseProtocol, favouritesVoucherUseCase: FavouriteVoucherUseCase, favouriteFoodUseCase: FavouriteFoodUseCase) {
+        self.stackListUseCase = useCase
         self.wishListUseCase = wishListUseCase
+        self.favouritesVoucherUseCase = favouritesVoucherUseCase
+        self.favouritesFoodUseCase = favouriteFoodUseCase
     }
     
     func getStackList(with type: StackListType) {
@@ -40,7 +48,7 @@ final class MyFavouritesViewModel {
                     self.statusSubject.send(.stackList(response: response))
                 }
             }
-        .store(in: &cancellables)
+            .store(in: &cancellables)
     }
     
     func updateWishList(id: String, operation: Int) {
@@ -56,7 +64,7 @@ final class MyFavouritesViewModel {
                         self.statusSubject.send(.updateWishList(response: response))
                     }
                 }
-            .store(in: &cancellables)
+                .store(in: &cancellables)
         } else {
             wishListUseCase.updateRestaurantWishListStatus(restaurantId: id, operation: operation)
                 .sink { [weak self] state in
@@ -69,8 +77,48 @@ final class MyFavouritesViewModel {
                         self.statusSubject.send(.updateWishList(response: response))
                     }
                 }
-            .store(in: &cancellables)
+                .store(in: &cancellables)
         }
+    }
+    
+    func getFavouriteVoucher() {
+        LocationManager.shared.getLocation { location, _ in
+            //            self.updatedLocation = location
+            //            if let _ = location {
+            //                CommonMethods.fireEvent(withTag: "location_enabled")
+            //            }
+            //            else {
+            //                CommonMethods.fireEvent(withTag: "location_disabled")
+            //            }
+            
+            self.favouritesVoucherUseCase.getFavouriteVoucher(withCurrentLocation: location, pageNumber: self.pageNumber)
+                .sink { [weak self] state in
+                    guard let self else { return }
+                    
+                    switch state {
+                    case .getFavourtieVoucherDidFail(let message):
+                        self.statusSubject.send(.showError(message: message))
+                    case .getFavourtieVoucherDidSucceed(let response):
+                        self.statusSubject.send(.favouriteVoucher(response: response))
+                    }
+                }
+                .store(in: &self.cancellables)
+        }
+    }
+    
+    func getFavouriteFood() {
+        self.favouritesFoodUseCase.getFavouriteFood()
+            .sink { [weak self] state in
+                guard let self else { return }
+                
+                switch state {
+                case .getFavouriteFoodDidFail(let message):
+                    self.statusSubject.send(.showError(message: message))
+                case .getFavouriteFoodDidSucceed(let response):
+                    self.statusSubject.send(.favouriteFood(response: response))
+                }
+            }
+            .store(in: &self.cancellables)
     }
 }
 
@@ -79,5 +127,7 @@ extension MyFavouritesViewModel {
         case showError(message: String)
         case stackList(response: FavouriteStackListResponse)
         case updateWishList(response: WishListResponseModel)
+        case favouriteVoucher(response: FavouriteVoucherResponse)
+        case favouriteFood(response: FavouriteFoodResponse)
     }
 }
