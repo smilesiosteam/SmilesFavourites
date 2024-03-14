@@ -35,13 +35,14 @@ public class MyFavouritesViewController: UIViewController {
     var tableViewDelegate: MyFavouritesTableViewDelegate?
     var viewModel: MyFavouritesViewModel?
     var showBackButton: Bool = false
-    weak var delegate: MyFavouritesViewControllerDelegate? = nil
+    public weak var delegate: MyFavouritesViewControllerDelegate? = nil
     
     // MARK: - Life Cycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         resetTableViewDataSource()
         viewModel?.getStackList(with: viewModel?.stackListType ?? .voucher)
+        viewModel?.getFavourites()
         
         setUpNavigationBar()
     }
@@ -156,6 +157,8 @@ public class MyFavouritesViewController: UIViewController {
                 
             case .updateWishList(let response):
                 print(response)
+                self.resetTableViewDataSource()
+                self.viewModel?.getFavourites()
             case .favouriteVoucher(let response):
                 self.configureFavoriteVoucher(with: response)
                 
@@ -177,12 +180,7 @@ public class MyFavouritesViewController: UIViewController {
                     
                     self.resetTableViewDataSource()
                     self.viewModel?.getStackList(with: stackListType)
-                    if self.viewModel?.stackListType == .voucher {
-                        self.viewModel?.getFavouriteVoucher()
-                    }
-                    else {
-                        self.viewModel?.getFavouriteFood()
-                    }
+                    self.viewModel?.getFavourites()
                 }
             }
         }.store(in: &cancellables)
@@ -212,6 +210,7 @@ public class MyFavouritesViewController: UIViewController {
     private func resetTableViewDataSource() {
         sections.removeAll()
         dataSource?.dataSources?.removeAll()
+        tableView.reloadData()
     }
     
     // MARK: - Private TableView Configure Methods
@@ -228,9 +227,10 @@ public class MyFavouritesViewController: UIViewController {
     
     private func configureFavoriteVoucher(with response: FavouriteVoucherResponse) {
         if let voucherList = response.offers, !voucherList.isEmpty {
-            let dataSource = TableViewDataSource.make(forFavouriteVoucher: voucherList, data: "#FFFFFF")
+            let dataSource = TableViewDataSource.make(forFavouriteVoucher: voucherList, data: "#FFFFFF", completion: { [weak self] isFavorite, offerId, indexPath in
+                self?.viewModel?.updateWishList(id: offerId, operation: 2)
+            })
             self.dataSource?.dataSources?.append(dataSource)
-            print(type(of: dataSource))
             sections.append(TableSectionData(index: sections.count, identifier: .favouritesList))
             
             configureDataSource()
@@ -239,7 +239,9 @@ public class MyFavouritesViewController: UIViewController {
     
     private func configureFavouriteFood(with response: FavouriteFoodResponse) {
         if let foodList = response.restaurants, !foodList.isEmpty {
-            let dataSource = TableViewDataSource.make(forFavouriteFood: foodList, data: "#FFFFFF")
+            let dataSource = TableViewDataSource.make(forFavouriteFood: foodList, data: "#FFFFFF", completion: { [weak self] isFavorite, restaurantId, indexPath in
+                self?.viewModel?.updateWishList(id: restaurantId, operation: 2)
+            })
             self.dataSource?.dataSources?.append(dataSource)
             sections.append(TableSectionData(index: sections.count, identifier: .favouritesList))
             

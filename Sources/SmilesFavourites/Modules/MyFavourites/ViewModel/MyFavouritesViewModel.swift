@@ -51,6 +51,15 @@ final class MyFavouritesViewModel {
             .store(in: &cancellables)
     }
     
+    func getFavourites() {
+        if stackListType == .voucher {
+            getFavouriteVoucher()
+        }
+        else {
+            getFavouriteFood()
+        }
+    }
+    
     func updateWishList(id: String, operation: Int) {
         if stackListType == .voucher {
             wishListUseCase.updateOfferWishListStatus(offerId: id, operation: operation)
