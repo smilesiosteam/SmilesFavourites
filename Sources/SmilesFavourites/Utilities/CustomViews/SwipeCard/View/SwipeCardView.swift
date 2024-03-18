@@ -17,16 +17,20 @@ final class SwipeCardView : UIView {
     private let titleContainerView = UIView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
+    private let minimumOrderLabel = UILabel()
+    private let minimumOrderTitleLabel = UILabel()
+    private let pipeSegregationLabel = UILabel()
+    private let deliveryChargesLabel = UILabel()
+    private let deliveryChargesTitleLabel = UILabel()
+    private let minimumOrderStackView = UIStackView()
     private let pointsStackView = UIStackView()
     private let pointsImageView = UIImageView()
     private let ratingLabel = UILabel()
     private let pointsTextStackView = UIStackView()
     private let pointsTextStackContainerView = UIView()
     private let pointsLabel = UILabel()
-    private let minimumOrderTitleLabel = UILabel()
     private let orLabel = UILabel()
     private let aedLabel = UILabel()
-    private let deliveryChargesTitleLabel = UILabel()
     
     private var cardType: StackListType = .voucher
     var delegate: SwipeCardsDelegate?
@@ -48,13 +52,17 @@ final class SwipeCardView : UIView {
         configureImageView()
         configureTitleLabelView()
         configureSubtitleLabelView()
+        configureMinimumOrderLabelView()
+        configureMinimumOrderTitleLabelView()
+        configurePipeSegregationLabelView()
+        configureDeliveryChargesLabelView()
+        configureDeliveryChargesTitleLabelView()
+        configureMinimumOrderStackView()
         configurePointsImageView()
         configurePointsLabelView()
-        configureMinimumOrderTitleLabelView()
         configureRatingLabel()
         configureOrLabelView()
         configureAEDLabelView()
-        configureDeliveryChargesTitleLabelView()
         configurePointsTextStackView()
         configurePointsStackView()
         configureTitleStackView()
@@ -132,13 +140,60 @@ final class SwipeCardView : UIView {
         subtitleLabel.numberOfLines = 1
     }
     
+    private func configureMinimumOrderLabelView() {
+        minimumOrderLabel.textColor = .black.withAlphaComponent(0.8)
+        minimumOrderLabel.textAlignment = .natural
+        minimumOrderLabel.fontTextStyle = .smilesTitle3
+        minimumOrderLabel.numberOfLines = 1
+    }
+    
+    private func configureMinimumOrderTitleLabelView() {
+        minimumOrderTitleLabel.textColor = .black.withAlphaComponent(0.6)
+        minimumOrderTitleLabel.textAlignment = .natural
+        minimumOrderTitleLabel.fontTextStyle = .smilesBody4
+        minimumOrderTitleLabel.numberOfLines = 1
+    }
+    
+    private func configurePipeSegregationLabelView() {
+        pipeSegregationLabel.textColor = .black.withAlphaComponent(0.6)
+        pipeSegregationLabel.textAlignment = .natural
+        pipeSegregationLabel.fontTextStyle = .smilesBody4
+        pipeSegregationLabel.numberOfLines = 1
+    }
+    
+    private func configureDeliveryChargesLabelView() {
+        deliveryChargesLabel.textColor = .black.withAlphaComponent(0.8)
+        deliveryChargesLabel.textAlignment = .natural
+        deliveryChargesLabel.fontTextStyle = .smilesTitle3
+        deliveryChargesLabel.numberOfLines = 1
+    }
+    
+    private func configureDeliveryChargesTitleLabelView() {
+        deliveryChargesTitleLabel.textColor = .black.withAlphaComponent(0.6)
+        deliveryChargesTitleLabel.textAlignment = .natural
+        deliveryChargesTitleLabel.fontTextStyle = .smilesBody3
+        deliveryChargesTitleLabel.numberOfLines = 1
+        deliveryChargesTitleLabel.lineBreakMode = .byTruncatingTail
+    }
+    
+    private func configureMinimumOrderStackView() {
+        minimumOrderStackView.axis = .horizontal
+        minimumOrderStackView.alignment = .fill
+        minimumOrderStackView.distribution = .fill
+        minimumOrderStackView.spacing = 4
+        
+        [minimumOrderLabel, minimumOrderTitleLabel, pipeSegregationLabel, deliveryChargesLabel, deliveryChargesTitleLabel].forEach {
+            minimumOrderStackView.addArrangedSubview($0)
+        }
+    }
+    
     private func configureTitleStackView() {
         swipeView.addSubview(titleStackView)
         titleStackView.axis = .vertical
         titleStackView.alignment = .fill
         titleStackView.distribution = .fill
         titleStackView.spacing = 4
-        [titleContainerView, subtitleLabel].forEach {
+        [titleContainerView, subtitleLabel, minimumOrderStackView].forEach {
             titleStackView.addArrangedSubview($0)
         }
         
@@ -146,7 +201,7 @@ final class SwipeCardView : UIView {
         NSLayoutConstraint.activate([
             titleStackView.topAnchor.constraint(equalTo: swipeView.topAnchor, constant: 16),
             titleStackView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 16),
-            titleStackView.trailingAnchor.constraint(equalTo: swipeView.trailingAnchor, constant: -16)
+            titleStackView.trailingAnchor.constraint(equalTo: swipeView.trailingAnchor, constant: -8)
         ])
     }
     
@@ -173,13 +228,6 @@ final class SwipeCardView : UIView {
         pointsLabel.numberOfLines = 1
     }
     
-    private func configureMinimumOrderTitleLabelView() {
-        minimumOrderTitleLabel.textColor = .black.withAlphaComponent(0.6)
-        minimumOrderTitleLabel.textAlignment = .natural
-        minimumOrderTitleLabel.fontTextStyle = .smilesBody3
-        minimumOrderTitleLabel.numberOfLines = 1
-    }
-    
     private func configureOrLabelView() {
         orLabel.textColor = .black.withAlphaComponent(0.6)
         orLabel.textAlignment = .natural
@@ -195,14 +243,6 @@ final class SwipeCardView : UIView {
         aedLabel.lineBreakMode = .byTruncatingTail
     }
     
-    private func configureDeliveryChargesTitleLabelView() {
-        deliveryChargesTitleLabel.textColor = .black.withAlphaComponent(0.6)
-        deliveryChargesTitleLabel.textAlignment = .natural
-        deliveryChargesTitleLabel.fontTextStyle = .smilesBody3
-        deliveryChargesTitleLabel.numberOfLines = 1
-        deliveryChargesTitleLabel.lineBreakMode = .byTruncatingTail
-    }
-    
     private func configurePointsTextStackView() {
         pointsTextStackContainerView.addSubview(pointsTextStackView)
         
@@ -210,7 +250,7 @@ final class SwipeCardView : UIView {
         pointsTextStackView.alignment = .fill
         pointsTextStackView.distribution = .fill
         pointsTextStackView.spacing = 8
-        [pointsLabel, minimumOrderTitleLabel, orLabel, aedLabel, deliveryChargesTitleLabel].forEach {
+        [pointsLabel, orLabel, aedLabel].forEach {
             pointsTextStackView.addArrangedSubview($0)
         }
         
@@ -268,59 +308,59 @@ final class SwipeCardView : UIView {
         
         imageView.setImageWithUrlString(dataSource?.restaurantImage ?? "")
         
-//        if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0, let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
-//            
-//            pointsLabel.isHidden = false
-//            minimumOrderTitleLabel.isHidden = false
-//            orLabel.isHidden = false
-//            aedLabel.isHidden = false
-//            deliveryChargesTitleLabel.isHidden = false
-//            
-//            pointsLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
-//            
-//            orLabel.text = "|"
-//            
-//            aedLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
-//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
-//        } else if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0 {
-//            
-//            pointsLabel.isHidden = false
-//            minimumOrderTitleLabel.isHidden = false
-//            orLabel.isHidden = false
-//            aedLabel.isHidden = true
-//            deliveryChargesTitleLabel.isHidden = false
-//            
-//            pointsLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
-//            
-//            orLabel.text = "|"
-//            
-//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-//        } else if let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
-//            
-//            pointsLabel.isHidden = true
-//            minimumOrderTitleLabel.isHidden = false
-//            orLabel.isHidden = false
-//            aedLabel.isHidden = false
-//            deliveryChargesTitleLabel.isHidden = false
-//            
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-//            
-//            orLabel.text = "|"
-//            
-//            aedLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
-//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
-//        } else {
-//            
-//            pointsLabel.isHidden = true
-//            minimumOrderTitleLabel.isHidden = false
-//            orLabel.isHidden = true
-//            aedLabel.isHidden = true
-//            deliveryChargesTitleLabel.isHidden = true
-//            
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-//        }
+        if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0, let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
+            
+            minimumOrderLabel.isHidden = false
+            minimumOrderTitleLabel.isHidden = false
+            pipeSegregationLabel.isHidden = false
+            deliveryChargesLabel.isHidden = false
+            deliveryChargesTitleLabel.isHidden = false
+            
+            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
+            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
+            
+            pipeSegregationLabel.text = "|"
+            
+            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
+            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
+        } else if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0 {
+            
+            minimumOrderLabel.isHidden = false
+            minimumOrderTitleLabel.isHidden = false
+            pipeSegregationLabel.isHidden = false
+            deliveryChargesLabel.isHidden = true
+            deliveryChargesTitleLabel.isHidden = false
+            
+            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
+            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
+            
+            pipeSegregationLabel.text = "|"
+            
+            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+        } else if let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
+            
+            minimumOrderLabel.isHidden = true
+            minimumOrderTitleLabel.isHidden = false
+            pipeSegregationLabel.isHidden = false
+            deliveryChargesLabel.isHidden = false
+            deliveryChargesTitleLabel.isHidden = false
+            
+            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+            
+            pipeSegregationLabel.text = "|"
+            
+            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
+            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
+        } else {
+            
+            minimumOrderLabel.isHidden = true
+            minimumOrderTitleLabel.isHidden = false
+            pipeSegregationLabel.isHidden = true
+            deliveryChargesLabel.isHidden = true
+            deliveryChargesTitleLabel.isHidden = true
+            
+            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+        }
     }
     
     private func configureTapGesture() {
