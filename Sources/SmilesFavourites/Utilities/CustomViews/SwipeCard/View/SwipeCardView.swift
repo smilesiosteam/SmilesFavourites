@@ -96,14 +96,13 @@ final class SwipeCardView : UIView {
     }
     
     func configureCardType(type: StackListType?) {
-        if let type = type {
+        if let type {
             cardType = type
         }
     }
     
     private func configureImageView() {
         swipeView.addSubview(imageView)
-        
         imageView.addMaskedCorner(withMaskedCorner: [.layerMaxXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMinXMinYCorner], cornerRadius: 8)
         imageView.addBorder(withBorderWidth: 1, borderColor: .black.withAlphaComponent(0.1))
         imageView.contentMode = .scaleToFill
@@ -130,7 +129,7 @@ final class SwipeCardView : UIView {
             titleLabel.topAnchor.constraint(equalTo: titleContainerView.topAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: titleContainerView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: titleContainerView.trailingAnchor),
-            titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: titleContainerView.bottomAnchor)
+            titleLabel.bottomAnchor.constraint(equalTo: titleContainerView.bottomAnchor)
         ])
     }
     
@@ -203,7 +202,7 @@ final class SwipeCardView : UIView {
             titleStackView.topAnchor.constraint(equalTo: swipeView.topAnchor, constant: 16),
             titleStackView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 16),
             titleStackView.trailingAnchor.constraint(equalTo: swipeView.trailingAnchor, constant: -8),
-            titleStackView.bottomAnchor.constraint(equalTo: pointsStackView.topAnchor)
+            titleStackView.bottomAnchor.constraint(lessThanOrEqualTo: pointsStackView.topAnchor)
         ])
     }
     
