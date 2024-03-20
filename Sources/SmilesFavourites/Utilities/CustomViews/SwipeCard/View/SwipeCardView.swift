@@ -103,6 +103,7 @@ final class SwipeCardView : UIView {
     
     private func configureImageView() {
         swipeView.addSubview(imageView)
+        
         imageView.addMaskedCorner(withMaskedCorner: [.layerMaxXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMinXMinYCorner], cornerRadius: 8)
         imageView.addBorder(withBorderWidth: 1, borderColor: .black.withAlphaComponent(0.1))
         imageView.contentMode = .scaleToFill
@@ -123,13 +124,13 @@ final class SwipeCardView : UIView {
         titleLabel.textAlignment = .natural
         titleLabel.fontTextStyle = .smilesHeadline3
         titleLabel.numberOfLines = 2
-        
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: titleContainerView.topAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: titleContainerView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: titleContainerView.trailingAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: titleContainerView.bottomAnchor)
+            titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: titleContainerView.bottomAnchor)
         ])
     }
     
@@ -137,7 +138,7 @@ final class SwipeCardView : UIView {
         subtitleLabel.textColor = .black
         subtitleLabel.textAlignment = .natural
         subtitleLabel.fontTextStyle = .smilesBody3
-        subtitleLabel.numberOfLines = 1
+        subtitleLabel.numberOfLines = 2
     }
     
     private func configureMinimumOrderLabelView() {
@@ -201,7 +202,8 @@ final class SwipeCardView : UIView {
         NSLayoutConstraint.activate([
             titleStackView.topAnchor.constraint(equalTo: swipeView.topAnchor, constant: 16),
             titleStackView.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 16),
-            titleStackView.trailingAnchor.constraint(equalTo: swipeView.trailingAnchor, constant: -8)
+            titleStackView.trailingAnchor.constraint(equalTo: swipeView.trailingAnchor, constant: -8),
+            titleStackView.bottomAnchor.constraint(equalTo: pointsStackView.topAnchor)
         ])
     }
     
@@ -308,59 +310,59 @@ final class SwipeCardView : UIView {
         
         imageView.setImageWithUrlString(dataSource?.restaurantImage ?? "")
         
-        if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0, let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
-            
-            minimumOrderLabel.isHidden = false
-            minimumOrderTitleLabel.isHidden = false
-            pipeSegregationLabel.isHidden = false
-            deliveryChargesLabel.isHidden = false
-            deliveryChargesTitleLabel.isHidden = false
-            
-            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
-            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
-            
-            pipeSegregationLabel.text = "|"
-            
-            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
-            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
-        } else if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0 {
-            
-            minimumOrderLabel.isHidden = false
-            minimumOrderTitleLabel.isHidden = false
-            pipeSegregationLabel.isHidden = false
-            deliveryChargesLabel.isHidden = true
-            deliveryChargesTitleLabel.isHidden = false
-            
-            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
-            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
-            
-            pipeSegregationLabel.text = "|"
-            
-            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-        } else if let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
-            
-            minimumOrderLabel.isHidden = true
-            minimumOrderTitleLabel.isHidden = false
-            pipeSegregationLabel.isHidden = false
-            deliveryChargesLabel.isHidden = false
-            deliveryChargesTitleLabel.isHidden = false
-            
-            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-            
-            pipeSegregationLabel.text = "|"
-            
-            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
-            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
-        } else {
-            
-            minimumOrderLabel.isHidden = true
-            minimumOrderTitleLabel.isHidden = false
-            pipeSegregationLabel.isHidden = true
-            deliveryChargesLabel.isHidden = true
-            deliveryChargesTitleLabel.isHidden = true
-            
-            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-        }
+//        if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0, let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
+//            
+//            minimumOrderLabel.isHidden = false
+//            minimumOrderTitleLabel.isHidden = false
+//            pipeSegregationLabel.isHidden = false
+//            deliveryChargesLabel.isHidden = false
+//            deliveryChargesTitleLabel.isHidden = false
+//            
+//            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
+//            
+//            pipeSegregationLabel.text = "|"
+//            
+//            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
+//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
+//        } else if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0 {
+//            
+//            minimumOrderLabel.isHidden = false
+//            minimumOrderTitleLabel.isHidden = false
+//            pipeSegregationLabel.isHidden = false
+//            deliveryChargesLabel.isHidden = true
+//            deliveryChargesTitleLabel.isHidden = false
+//            
+//            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
+//            
+//            pipeSegregationLabel.text = "|"
+//            
+//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+//        } else if let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
+//            
+//            minimumOrderLabel.isHidden = true
+//            minimumOrderTitleLabel.isHidden = false
+//            pipeSegregationLabel.isHidden = false
+//            deliveryChargesLabel.isHidden = false
+//            deliveryChargesTitleLabel.isHidden = false
+//            
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+//            
+//            pipeSegregationLabel.text = "|"
+//            
+//            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
+//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
+//        } else {
+//            
+//            minimumOrderLabel.isHidden = true
+//            minimumOrderTitleLabel.isHidden = false
+//            pipeSegregationLabel.isHidden = true
+//            deliveryChargesLabel.isHidden = true
+//            deliveryChargesTitleLabel.isHidden = true
+//            
+//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
+//        }
     }
     
     private func configureTapGesture() {
