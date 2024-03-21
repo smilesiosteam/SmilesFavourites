@@ -39,10 +39,10 @@ final class FavouriteVoucherUseCase: FavouriteVoucherUseCaseProtocol {
             self.repository.getFavouriteVoucher(request: request)
                 .sink { completion in
                     if case .failure(let error) = completion {
-                        promise(.success(.getFavourtieVoucherDidFail(message: error.localizedDescription)))
+                        promise(.success(.getFavouriteVoucherDidFail(message: error.localizedDescription)))
                     }
                 } receiveValue: { response in
-                    promise(.success(.getFavourtieVoucherDidSucceed(response: response)))
+                    promise(.success(.getFavouriteVoucherDidSucceed(response: response)))
                 }
                 .store(in: &cancellables)
         }
@@ -52,7 +52,7 @@ final class FavouriteVoucherUseCase: FavouriteVoucherUseCaseProtocol {
 
 extension FavouriteVoucherUseCase {
     enum State {
-        case getFavourtieVoucherDidFail(message: String)
-        case getFavourtieVoucherDidSucceed(response: FavouriteVoucherResponse)
+        case getFavouriteVoucherDidFail(message: String)
+        case getFavouriteVoucherDidSucceed(response: FavouriteVoucherResponse)
     }
 }

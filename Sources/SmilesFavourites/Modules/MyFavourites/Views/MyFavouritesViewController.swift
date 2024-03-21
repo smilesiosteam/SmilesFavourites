@@ -36,13 +36,13 @@ public class MyFavouritesViewController: UIViewController {
     var viewModel: MyFavouritesViewModel?
     var showBackButton: Bool = false
     public weak var delegate: MyFavouritesViewControllerDelegate? = nil
+    private var snackbar: SnackbarView?
     
     // MARK: - Life Cycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         resetTableViewDataSource()
         viewModel?.getStackList(with: viewModel?.stackListType ?? .voucher)
-        viewModel?.getFavourites()
         
         setUpNavigationBar()
     }
@@ -51,6 +51,8 @@ public class MyFavouritesViewController: UIViewController {
         super.viewWillDisappear(animated)
         
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.removeSnackbar()
+        self.viewModel?.removeFromFavourites()
     }
     
     public override func viewDidLoad() {
@@ -157,13 +159,17 @@ public class MyFavouritesViewController: UIViewController {
                 
             case .updateWishList(let response):
                 print(response)
-                self.resetTableViewDataSource()
-                self.viewModel?.getFavourites()
+                self.viewModel?.resetRemoveFavourites()
+                
             case .favouriteVoucher(let response):
-                self.configureFavoriteVoucher(with: response)
+                if viewModel?.stackListType == .voucher {
+                    self.configureFavoriteVoucher(with: response)
+                }
                 
             case .favouriteFood(let response):
-                self.configureFavouriteFood(with: response)
+                if viewModel?.stackListType == .food {
+                    self.configureFavouriteFood(with: response)
+                }
             }
         }.store(in: &cancellables)
     }
@@ -174,13 +180,15 @@ public class MyFavouritesViewController: UIViewController {
             
             switch state {
             case .didSelectItem(let index):
+                self.removeSnackbar()
+                self.viewModel?.removeFromFavourites()
+                
                 self.segmentsCollectionView.reloadData()
                 if let stackListType = StackListType(rawValue: index) {
                     self.viewModel?.stackListType = stackListType
                     
                     self.resetTableViewDataSource()
                     self.viewModel?.getStackList(with: stackListType)
-                    self.viewModel?.getFavourites()
                 }
             }
         }.store(in: &cancellables)
@@ -228,10 +236,21 @@ public class MyFavouritesViewController: UIViewController {
     private func configureFavoriteVoucher(with response: FavouriteVoucherResponse) {
         if let voucherList = response.offers, !voucherList.isEmpty {
             let dataSource = TableViewDataSource.make(forFavouriteVoucher: voucherList, data: "#FFFFFF", completion: { [weak self] isFavorite, offerId, indexPath in
-                self?.viewModel?.updateWishList(id: offerId, operation: 2)
+                
+                if let indexPath = indexPath {
+                    if let vouchers = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>? {
+                        self?.viewModel?.removeFromFavourites()
+                        self?.showSnackbar()
+                        self?.viewModel?.removeFavouriteData = vouchers?.models?[indexPath.row]
+                        self?.viewModel?.removeIndexPath = indexPath
+                        (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>)?.models?.remove(at: indexPath.row)
+                        self?.tableView.reloadData()
+                    }
+                }
             })
+            
             self.dataSource?.dataSources?.append(dataSource)
-            sections.append(TableSectionData(index: sections.count, identifier: .favouritesList))
+            sections.append(TableSectionData(index: 0, identifier: .favouritesList))
             
             configureDataSource()
         }
@@ -240,13 +259,58 @@ public class MyFavouritesViewController: UIViewController {
     private func configureFavouriteFood(with response: FavouriteFoodResponse) {
         if let foodList = response.restaurants, !foodList.isEmpty {
             let dataSource = TableViewDataSource.make(forFavouriteFood: foodList, data: "#FFFFFF", completion: { [weak self] isFavorite, restaurantId, indexPath in
-                self?.viewModel?.updateWishList(id: restaurantId, operation: 2)
+                
+                if let indexPath = indexPath {
+                    if let foods = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>? {
+                        self?.viewModel?.removeFromFavourites()
+                        self?.showSnackbar()
+                        self?.viewModel?.removeFavouriteData = foods?.models?[indexPath.row]
+                        self?.viewModel?.removeIndexPath = indexPath
+                        (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?.remove(at: indexPath.row)
+                        self?.tableView.reloadData()
+                    }
+                }
             })
             self.dataSource?.dataSources?.append(dataSource)
-            sections.append(TableSectionData(index: sections.count, identifier: .favouritesList))
+            sections.append(TableSectionData(index: 0, identifier: .favouritesList))
             
             configureDataSource()
         }
+    }
+    
+    private func showSnackbar() {
+        removeSnackbar()
+        snackbar = SnackbarView(message: SmilesFavouritesLocalization.removedFromFavouritesTitle.text, actionTitle: SmilesFavouritesLocalization.undoTitle.text)
+        snackbar?.show(in: self.view)
+        snackbar?.actionHandler = { [weak self] in
+            self?.snackbar = nil
+            if self?.viewModel?.stackListType == .voucher {
+                if let offerData = self?.viewModel?.removeFavouriteData as? OfferDO,
+                   let indexPath = self?.viewModel?.removeIndexPath {
+                    (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>)?.models?.insert(offerData, at: indexPath.row)
+                    self?.viewModel?.undoFavourites()
+                    self?.tableView.reloadData()
+                }
+            }
+            else if self?.viewModel?.stackListType == .food {
+                if let foodData = self?.viewModel?.removeFavouriteData as? Restaurant,
+                   let indexPath = self?.viewModel?.removeIndexPath {
+                    (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?.insert(foodData, at: indexPath.row)
+                    self?.viewModel?.undoFavourites()
+                    self?.tableView.reloadData()
+                }
+            }
+        }
+        snackbar?.completion = { [weak self] in
+            self?.viewModel?.removeFromFavourites()
+            self?.snackbar = nil
+        }
+    }
+    
+    func removeSnackbar() {
+        snackbar?.removeFromSuperview()
+        snackbar?.completion = nil
+        snackbar = nil
     }
 }
 

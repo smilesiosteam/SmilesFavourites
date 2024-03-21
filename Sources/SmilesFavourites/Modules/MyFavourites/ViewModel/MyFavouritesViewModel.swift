@@ -10,6 +10,8 @@ import Combine
 import SmilesSharedServices
 import SmilesLocationHandler
 import CoreLocation
+import SmilesOffers
+import SmilesUtilities
 
 final class MyFavouritesViewModel {
     // MARK: - Properties
@@ -26,7 +28,9 @@ final class MyFavouritesViewModel {
     let arraySegments = [SmilesFavouritesLocalization.vouchersTitle.text, SmilesFavouritesLocalization.foodTitle.text]
     var stackListType: StackListType = .voucher
     var pageNumber = 1
-    
+    var removeFavouriteData: Any?
+    var removeIndexPath: IndexPath?
+    var lastRemoveId: String?
     
     // MARK: - Init
     init(useCase: StackListUseCaseProtocol, wishListUseCase: WishListUseCaseProtocol, favouritesVoucherUseCase: FavouriteVoucherUseCase, favouriteFoodUseCase: FavouriteFoodUseCase) {
@@ -47,6 +51,8 @@ final class MyFavouritesViewModel {
                 case .getStackListDidSucceed(let response):
                     self.statusSubject.send(.stackList(response: response))
                 }
+                
+                self.getFavourites()
             }
             .store(in: &cancellables)
     }
@@ -61,6 +67,7 @@ final class MyFavouritesViewModel {
     }
     
     func updateWishList(id: String, operation: Int) {
+        lastRemoveId = id
         if stackListType == .voucher {
             wishListUseCase.updateOfferWishListStatus(offerId: id, operation: operation)
                 .sink { [weak self] state in
@@ -105,9 +112,9 @@ final class MyFavouritesViewModel {
                     guard let self else { return }
                     
                     switch state {
-                    case .getFavourtieVoucherDidFail(let message):
+                    case .getFavouriteVoucherDidFail(let message):
                         self.statusSubject.send(.showError(message: message))
-                    case .getFavourtieVoucherDidSucceed(let response):
+                    case .getFavouriteVoucherDidSucceed(let response):
                         self.statusSubject.send(.favouriteVoucher(response: response))
                     }
                 }
@@ -128,6 +135,42 @@ final class MyFavouritesViewModel {
                 }
             }
             .store(in: &self.cancellables)
+    }
+    
+    func undoFavourites() {
+        self.removeFavouriteData = nil
+        self.removeIndexPath = nil
+        self.lastRemoveId = nil
+    }
+    
+    func resetRemoveFavourites() {
+        if lastRemoveId == nil {
+            self.removeFavouriteData = nil
+            self.removeIndexPath = nil
+        }
+        else {
+            if let offerData = self.removeFavouriteData as? OfferDO {
+                if offerData.offerId == lastRemoveId {
+                    self.undoFavourites()
+                }
+            }
+            else if let foodData = self.removeFavouriteData as? Restaurant {
+                if foodData.restaurantId == lastRemoveId {
+                    self.undoFavourites()
+                }
+            }
+        }
+    }
+    
+    func removeFromFavourites() {
+        if let offerData = self.removeFavouriteData as? OfferDO,
+            let offerId = offerData.offerId {
+            self.updateWishList(id: offerId, operation: 2)
+        }
+        else if let foodData = self.removeFavouriteData as? Restaurant,
+                let restaurantId = foodData.restaurantId {
+            self.updateWishList(id: restaurantId, operation: 2)
+        }
     }
 }
 

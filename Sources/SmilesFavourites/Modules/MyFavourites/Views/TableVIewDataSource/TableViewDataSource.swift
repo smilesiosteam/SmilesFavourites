@@ -34,6 +34,7 @@ extension TableViewDataSource where Model == OfferDO {
             guard let cell = cell as? RestaurantsRevampTableViewCell else { return }
             cell.selectionStyle = .none
             cell.offerCellType = .favourite
+            cell.restaurantData = nil
             cell.configureCell(with: voucherData)
             cell.favoriteCallback = { isFavorite, offerId in
                 completion?(isFavorite, offerId, indexPath)
@@ -53,6 +54,7 @@ extension TableViewDataSource where Model == Restaurant {
             guard let cell = cell as? RestaurantsRevampTableViewCell else { return }
             cell.selectionStyle = .none
             foodData.isFavoriteRestaurant = true
+            cell.offerData = nil
             cell.configureCell(with: foodData)
             cell.favoriteCallback = { isFavorite, restaurantId in
                 completion?(isFavorite, restaurantId, indexPath)

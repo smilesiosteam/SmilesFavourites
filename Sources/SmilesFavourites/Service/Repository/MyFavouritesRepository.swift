@@ -35,9 +35,9 @@ final class MyFavouritesRepository: MyFavouritesServiceable {
     }
     
     func getFavouriteVoucher(request: FavouriteVoucherRequest) -> AnyPublisher<FavouriteVoucherResponse, NetworkError> {
-        let endPoint = MyFavouritesRequestBuilder.getFavourtieVoucher(request: request)
+        let endPoint = MyFavouritesRequestBuilder.getFavouriteVoucher(request: request)
         let request = endPoint.createRequest(
-            endPoint: .getFavourtieVoucher
+            endPoint: .getFavouriteVoucher
         )
 
         return networkRequest.request(request)
