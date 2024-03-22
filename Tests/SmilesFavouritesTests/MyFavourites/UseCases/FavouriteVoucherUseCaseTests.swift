@@ -36,7 +36,7 @@ final class FavouriteVoucherUseCaseTests: XCTestCase {
         let result = try awaitPublisher(publisher)
         // Then
         let expectedResult = FavouriteVoucherUseCase.State.getFavouriteVoucherDidSucceed(response: model)
-        XCTAssertEqual(result, expectedResult, "teste")
+        XCTAssertEqual(result, expectedResult)
     }
     
     func test_favouriteVoucher_failureResponse_showError() throws {

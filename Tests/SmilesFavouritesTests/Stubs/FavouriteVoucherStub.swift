@@ -11,7 +11,7 @@ import SmilesTests
 
 enum FavouriteVoucherStub {
     static var getFavouriteVoucherModel: FavouriteVoucherResponse {
-        let model: FavouriteVoucherResponse? = readJsonFile("Order_Tracking_Model", bundle: .module)
+        let model: FavouriteVoucherResponse? = readJsonFile("Favourite_Voucher_Model", bundle: .module)
         return model ?? .init()
     }
 }
