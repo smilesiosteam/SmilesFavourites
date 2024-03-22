@@ -39,10 +39,11 @@ let package = Package(
                 .product(name: "SmilesOffers", package: "SmilesOffers"),
                 .product(name: "SmilesSharedServices", package: "SmilesSharedServices"),
                 .product(name: "SmilesLocationHandler", package: "SmilesLocationHandler"),
-                .product(name: "SmilesTests", package: "SmilesTests")
             ]),
         .testTarget(
             name: "SmilesFavouritesTests",
-            dependencies: ["SmilesFavourites"]),
+            dependencies: ["SmilesFavourites", "SmilesTests"],
+            resources: [.process("Resources")]
+        ),
     ]
 )
