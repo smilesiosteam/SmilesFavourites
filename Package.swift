@@ -36,6 +36,9 @@ let package = Package(
                 .product(name: "NetworkingLayer", package: "NetworkingLayer"),
                 .product(name: "SmilesOffers", package: "SmilesOffers"),
                 .product(name: "SmilesSharedServices", package: "SmilesSharedServices")
+            ],
+            resources: [
+                .process("Resources")
             ]),
         .testTarget(
             name: "SmilesFavouritesTests",

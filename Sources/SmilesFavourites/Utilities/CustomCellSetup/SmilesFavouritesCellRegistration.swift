@@ -11,6 +11,7 @@ import SmilesOffers
 
 struct SmilesFavouritesCellRegistration: CellRegisterable {
     func register(for tableView: UITableView) {
+        tableView.registerCellFromNib(SwipeMessageTableViewCell.self, bundle: .module)
         tableView.registerCellFromNib(FavouritesStackListTableViewCell.self, bundle: .module)
         tableView.registerCellFromNib(RestaurantsRevampTableViewCell.self, bundle: RestaurantsRevampTableViewCell.module)
     }

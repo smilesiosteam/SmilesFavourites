@@ -34,6 +34,7 @@ final class StackContainerView: UIView, SwipeCardsDelegate {
     
     weak var delegate: StackContainerDelegate?
     private var colors = [UIColor.white, UIColor(red: 242 / 255, green: 242 / 255, blue: 242 / 255, alpha: 1.0), UIColor(red: 230 / 255, green: 230 / 255, blue: 230 / 255, alpha: 1.0)]
+    private var shouldSkeleton = false
     
     // MARK: - Init
     override init(frame: CGRect) {
@@ -56,6 +57,11 @@ final class StackContainerView: UIView, SwipeCardsDelegate {
         for i in 0..<min(numberOfCardsToShow, cardsToBeVisible) {
             let card = datasource.card(at: i)
             card.configureBackgroundColor(color: colors[safe: i])
+            if shouldSkeleton {
+                card.enableSkeleton()
+                card.disableSkeletonViews()
+                card.showAnimatedSkeleton()
+            }
             addCardView(cardView: card, atIndex: i)
         }
     }
@@ -115,6 +121,10 @@ final class StackContainerView: UIView, SwipeCardsDelegate {
         }
         
         delegate?.swipeDidEnd(on: view, direction: direction)
+    }
+    
+    func setShouldSkeleton(shouldSkeleton: Bool) {
+        self.shouldSkeleton = shouldSkeleton
     }
 }
 

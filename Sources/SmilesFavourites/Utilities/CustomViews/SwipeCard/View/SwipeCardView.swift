@@ -308,60 +308,6 @@ final class SwipeCardView : UIView {
         }
         
         imageView.setImageWithUrlString(dataSource?.restaurantImage ?? "")
-        
-//        if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0, let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
-//            
-//            minimumOrderLabel.isHidden = false
-//            minimumOrderTitleLabel.isHidden = false
-//            pipeSegregationLabel.isHidden = false
-//            deliveryChargesLabel.isHidden = false
-//            deliveryChargesTitleLabel.isHidden = false
-//            
-//            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
-//            
-//            pipeSegregationLabel.text = "|"
-//            
-//            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
-//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
-//        } else if let minimumOrder = dataSource?.minimumOrder, (Double(minimumOrder) ?? 0) > 0 {
-//            
-//            minimumOrderLabel.isHidden = false
-//            minimumOrderTitleLabel.isHidden = false
-//            pipeSegregationLabel.isHidden = false
-//            deliveryChargesLabel.isHidden = true
-//            deliveryChargesTitleLabel.isHidden = false
-//            
-//            minimumOrderLabel.text = "\(minimumOrder) \(SmilesFavouritesLocalization.aed.text)"
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.minimumOrderTitle.text
-//            
-//            pipeSegregationLabel.text = "|"
-//            
-//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-//        } else if let deliveryCharges = dataSource?.deliveryCharges, deliveryCharges > 0 {
-//            
-//            minimumOrderLabel.isHidden = true
-//            minimumOrderTitleLabel.isHidden = false
-//            pipeSegregationLabel.isHidden = false
-//            deliveryChargesLabel.isHidden = false
-//            deliveryChargesTitleLabel.isHidden = false
-//            
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-//            
-//            pipeSegregationLabel.text = "|"
-//            
-//            deliveryChargesLabel.text = "\(deliveryCharges) \(SmilesFavouritesLocalization.aed.text)"
-//            deliveryChargesTitleLabel.text = SmilesFavouritesLocalization.deliveryChargesTitle.text
-//        } else {
-//            
-//            minimumOrderLabel.isHidden = true
-//            minimumOrderTitleLabel.isHidden = false
-//            pipeSegregationLabel.isHidden = true
-//            deliveryChargesLabel.isHidden = true
-//            deliveryChargesTitleLabel.isHidden = true
-//            
-//            minimumOrderTitleLabel.text = SmilesFavouritesLocalization.freeDeliveryTitle.text
-//        }
     }
     
     private func configureTapGesture() {
@@ -371,6 +317,10 @@ final class SwipeCardView : UIView {
     private func addPanGestureOnCards() {
         self.isUserInteractionEnabled = true
         addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture)))
+    }
+    
+    func disableSkeletonViews() {
+        minimumOrderStackView.isSkeletonable = false
     }
     
     //MARK: - Handlers

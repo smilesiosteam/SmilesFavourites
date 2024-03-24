@@ -37,13 +37,13 @@ public class MyFavouritesViewController: UIViewController {
     var showBackButton: Bool = false
     public weak var delegate: MyFavouritesViewControllerDelegate? = nil
     private var snackbar: SnackbarView?
+    private var stackCards: [StackCard]?
     
     // MARK: - Life Cycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         resetTableViewDataSource()
-        viewModel?.getStackList(with: viewModel?.stackListType ?? .voucher)
-        
+        configureSections()
         setUpNavigationBar()
     }
     
@@ -90,8 +90,6 @@ public class MyFavouritesViewController: UIViewController {
         let customizable: CellRegisterable? = SmilesFavouritesCellRegistration()
         customizable?.register(for: self.tableView)
         self.tableView.backgroundColor = .white
-        
-        dataSource = SectionedTableViewDataSource(dataSources: [])
     }
     
     private func setUpNavigationBar() {
@@ -157,9 +155,9 @@ public class MyFavouritesViewController: UIViewController {
             case .stackList(let response):
                 self.configureStackList(with: response)
                 
-            case .updateWishList(let response):
+            case .updateWishList(let response, let operation):
                 print(response)
-                self.viewModel?.resetRemoveFavourites()
+                self.configureUpdateWishList(operation: operation)
                 
             case .favouriteVoucher(let response):
                 if viewModel?.stackListType == .voucher {
@@ -188,7 +186,7 @@ public class MyFavouritesViewController: UIViewController {
                     self.viewModel?.stackListType = stackListType
                     
                     self.resetTableViewDataSource()
-                    self.viewModel?.getStackList(with: stackListType)
+                    self.configureSections()
                 }
             }
         }.store(in: &cancellables)
@@ -216,66 +214,188 @@ public class MyFavouritesViewController: UIViewController {
     }
     
     private func resetTableViewDataSource() {
-        sections.removeAll()
+        viewModel?.badgeCount = 0
+        viewModel?.swipeCount = 0
+        viewModel?.hasStackList = false
+        viewModel?.hasFavourites = false
+        viewModel?.didUpdateSwipeMessage = false
         dataSource?.dataSources?.removeAll()
-        tableView.reloadData()
+    }
+    
+    private func configureSections() {
+        dataSource = SectionedTableViewDataSource(dataSources: Array(repeating: [], count: viewModel?.sections.count ?? 0))
+        configureDataSource()
+        sections.removeAll()
+        
+        for (index, element) in (viewModel?.sections ?? []).enumerated() {
+            let section = element.identifier
+            sections.append(TableSectionData(index: index, identifier: section))
+            
+            switch section {
+            case .swipeMessage:
+                if let viewModel = SwipeMessageViewModel.fromModuleFile() {
+                    self.dataSource?.dataSources?[index] = TableViewDataSource.make(forSwipeMessage: viewModel, data: "#FFFFFF", isDummy: true)
+                }
+            case .stackList:
+                if let response = FavouriteStackListResponse.fromModuleFile() {
+                    let viewModel = FavouritesStackListTableViewCell.ViewModel(swipeCards: response.stackList, stackListType: viewModel?.stackListType ?? .voucher, delegate: self)
+                    self.dataSource?.dataSources?[index] = TableViewDataSource.make(forStackList: response, viewModel: viewModel, data: "#FFFFFF", isDummy: true)
+                }
+                
+                viewModel?.getStackList(with: viewModel?.stackListType ?? .voucher)
+            case .favouritesList:
+                if viewModel?.stackListType == .voucher {
+                    if let offersCategory = OffersCategoryResponseModel.fromFile() {
+                        self.dataSource?.dataSources?[index] = TableViewDataSource.make(forFavouriteVoucher: offersCategory.offers ?? [], data: "#FFFFFF", isDummy: true, completion: nil)
+                    }
+                } else {
+                    if let response = [Restaurant].fromFile() {
+                        self.dataSource?.dataSources?[index] = TableViewDataSource.make(forFavouriteFood: response, data:"#FFFFFF", isDummy: true, completion: nil)
+                    }
+                }
+                
+                viewModel?.getFavourites()
+            }
+        }
+        
+        OperationQueue.main.addOperation {
+            self.tableView.reloadData()
+        }
     }
     
     // MARK: - Private TableView Configure Methods
+    private func configureSwipeMessage(with viewModel: SwipeMessageViewModel) {
+        if let index = getSectionIndex(for: .swipeMessage) {
+            self.dataSource?.dataSources?[index] = TableViewDataSource.make(forSwipeMessage: viewModel, data: "#FFFFFF")
+            
+            tableView.dataSource = dataSource
+            tableView.reloadSections([index], with: .automatic)
+        }
+    }
+    
+    private func configureSwipeMessageState() {
+        if (viewModel?.hasStackList ?? false) && !(viewModel?.hasFavourites ?? false) {
+            let swipeMessageState = SwipeMessageState.favouritesListEmpty.state
+            let viewModel = SwipeMessageViewModel(iconImage: swipeMessageState.icon, title: swipeMessageState.title, message: swipeMessageState.message, badgeCount: 0)
+            configureSwipeMessage(with: viewModel)
+        } else if (viewModel?.hasStackList ?? false) && (viewModel?.hasFavourites ?? false) {
+            let swipeMessageState = SwipeMessageState.swipeToAddToFavouritesWithoutSwipe.state
+            let viewModel = SwipeMessageViewModel(iconImage: swipeMessageState.icon, title: swipeMessageState.title, message: swipeMessageState.message, badgeCount: 0)
+            configureSwipeMessage(with: viewModel)
+        }
+    }
+    
+    private func updateSwipeMessage(with viewModel: SwipeMessageViewModel) {
+        if let index = getSectionIndex(for: .swipeMessage) {
+            dataSource?.dataSources?[index] = TableViewDataSource.make(forSwipeMessage: viewModel, data: "#FFFFFF")
+            tableView.dataSource = dataSource
+            tableView.reloadSections([index], with: .automatic)
+        }
+    }
+    
     private func configureStackList(with response: FavouriteStackListResponse) {
         if let stackList = response.stackList, !stackList.isEmpty {
-            let viewModel = FavouritesStackListTableViewCell.ViewModel(iconImage: .favouritesEmptyIcon, title: SmilesFavouritesLocalization.favouriteListEmptyMessage.text, message: SmilesFavouritesLocalization.swipeStackListMessage.text, badgeCount: 0, swipeCards: stackList, stackListType: viewModel?.stackListType ?? .voucher, delegate: self)
-            let dataSource = TableViewDataSource.make(forStackList: response, viewModel: viewModel, data: "#FFFFFF")
-            self.dataSource?.dataSources?.append(dataSource)
-            sections.append(TableSectionData(index: 0, identifier: .stackList))
+            stackCards = stackList
+            viewModel?.hasStackList = true
+            
+            if let index = getSectionIndex(for: .stackList) {
+                let favouritesStackListViewModel = FavouritesStackListTableViewCell.ViewModel(swipeCards: stackList, stackListType: viewModel?.stackListType ?? .voucher, delegate: self)
+                self.dataSource?.dataSources?[index] = TableViewDataSource.make(forStackList: response, viewModel: favouritesStackListViewModel, data: "#FFFFFF")
+            }
             
             configureDataSource()
+        } else {
+            viewModel?.hasStackList = false
+            configureHideSection(for: .swipeMessage, dataSource: SwipeMessageViewModel.self)
+            configureHideSection(for: .stackList, dataSource: FavouriteStackListResponse.self)
         }
     }
     
     private func configureFavoriteVoucher(with response: FavouriteVoucherResponse) {
         if let voucherList = response.offers, !voucherList.isEmpty {
-            let dataSource = TableViewDataSource.make(forFavouriteVoucher: voucherList, data: "#FFFFFF", completion: { [weak self] isFavorite, offerId, indexPath in
-                
-                if let indexPath = indexPath {
-                    if let vouchers = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>? {
-                        self?.viewModel?.removeFromFavourites()
-                        self?.showSnackbar()
-                        self?.viewModel?.removeFavouriteData = vouchers?.models?[indexPath.row]
-                        self?.viewModel?.removeIndexPath = indexPath
-                        (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>)?.models?.remove(at: indexPath.row)
-                        self?.tableView.reloadData()
+            viewModel?.hasFavourites = true
+            if !(viewModel?.didUpdateSwipeMessage ?? false) {
+                configureSwipeMessageState()
+            }
+            
+            if let index = getSectionIndex(for: .favouritesList) {
+                self.dataSource?.dataSources?[index] = TableViewDataSource.make(forFavouriteVoucher: voucherList, data: "#FFFFFF", completion: { [weak self] isFavorite, offerId, indexPath in
+                    
+                    if let indexPath {
+                        if let vouchers = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>? {
+                            self?.viewModel?.removeFromFavourites()
+                            self?.showSnackbar()
+                            self?.viewModel?.removeFavouriteData = vouchers?.models?[indexPath.row]
+                            self?.viewModel?.removeIndexPath = indexPath
+                            (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>)?.models?.remove(at: indexPath.row)
+                            self?.tableView.reloadData()
+                        }
                     }
-                }
-            })
-            
-            self.dataSource?.dataSources?.append(dataSource)
-            sections.append(TableSectionData(index: 0, identifier: .favouritesList))
-            
-            configureDataSource()
+                })
+                
+                tableView.dataSource = dataSource
+                tableView.reloadSections([index], with: .automatic)
+            }
+        } else {
+            viewModel?.hasFavourites = false
+            configureSwipeMessageState()
+            configureHideSection(for: .favouritesList, dataSource: OfferDO.self)
         }
     }
     
     private func configureFavouriteFood(with response: FavouriteFoodResponse) {
         if let foodList = response.restaurants, !foodList.isEmpty {
-            let dataSource = TableViewDataSource.make(forFavouriteFood: foodList, data: "#FFFFFF", completion: { [weak self] isFavorite, restaurantId, indexPath in
-                
-                if let indexPath = indexPath {
-                    if let foods = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>? {
-                        self?.viewModel?.removeFromFavourites()
-                        self?.showSnackbar()
-                        self?.viewModel?.removeFavouriteData = foods?.models?[indexPath.row]
-                        self?.viewModel?.removeIndexPath = indexPath
-                        (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?.remove(at: indexPath.row)
-                        self?.tableView.reloadData()
-                    }
-                }
-            })
-            self.dataSource?.dataSources?.append(dataSource)
-            sections.append(TableSectionData(index: 0, identifier: .favouritesList))
+            viewModel?.hasFavourites = true
+            if !(viewModel?.didUpdateSwipeMessage ?? false) {
+                configureSwipeMessageState()
+            }
             
-            configureDataSource()
+            if let index = getSectionIndex(for: .favouritesList) {
+                self.dataSource?.dataSources?[index] = TableViewDataSource.make(forFavouriteFood: foodList, data: "#FFFFFF", completion: { [weak self] isFavorite, restaurantId, indexPath in
+                    
+                    if let indexPath = indexPath {
+                        if let foods = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>? {
+                            self?.viewModel?.removeFromFavourites()
+                            self?.showSnackbar()
+                            self?.viewModel?.removeFavouriteData = foods?.models?[indexPath.row]
+                            self?.viewModel?.removeIndexPath = indexPath
+                            (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?.remove(at: indexPath.row)
+                            self?.tableView.reloadData()
+                        }
+                    }
+                })
+                
+                tableView.dataSource = dataSource
+                tableView.reloadSections([index], with: .automatic)
+            }
+        } else {
+            viewModel?.hasFavourites = false
+            configureSwipeMessageState()
+            configureHideSection(for: .favouritesList, dataSource: Restaurant.self)
         }
+    }
+    
+    private func configureUpdateWishList(operation: Int) {
+        if stackCards?.count == self.viewModel?.swipeCount {
+            let swipeMessageState = SwipeMessageState.greatJob.state
+            let viewModel = SwipeMessageViewModel(iconImage: swipeMessageState.icon, title: swipeMessageState.title, message: swipeMessageState.message, badgeCount: 0)
+            updateSwipeMessage(with: viewModel)
+            configureHideSection(for: .stackList, dataSource: FavouriteStackListResponse.self)
+            
+            self.viewModel?.didUpdateSwipeMessage = true
+            self.viewModel?.getFavourites()
+        } else {
+            if operation == 1 {
+                let swipeMessageState = SwipeMessageState.swipeToAddToFavouritesWithSwipe.state
+                let viewModel = SwipeMessageViewModel(iconImage: swipeMessageState.icon, title: swipeMessageState.title, message: swipeMessageState.message, badgeCount: viewModel?.badgeCount)
+                updateSwipeMessage(with: viewModel)
+                
+                self.viewModel?.didUpdateSwipeMessage = true
+                self.viewModel?.getFavourites()
+            }
+        }
+
+        self.viewModel?.resetRemoveFavourites()
     }
     
     private func showSnackbar() {
@@ -312,6 +432,21 @@ public class MyFavouritesViewController: UIViewController {
         snackbar?.completion = nil
         snackbar = nil
     }
+    
+    private func getSectionIndex(for identifier: SmilesFavouritesSectionIdentifier) -> Int? {
+        return sections.first(where: { obj in
+            return obj.identifier == identifier
+        })?.index
+    }
+    
+    private func configureHideSection<T>(for section: SmilesFavouritesSectionIdentifier, dataSource: T.Type) {
+        if let index = getSectionIndex(for: section) {
+            (self.dataSource?.dataSources?[index] as? TableViewDataSource<T>)?.models = []
+            (self.dataSource?.dataSources?[index] as? TableViewDataSource<T>)?.isDummy = false
+            
+            self.configureDataSource()
+        }
+    }
 }
 
 // MARK: - Create
@@ -326,7 +461,7 @@ extension MyFavouritesViewController {
 extension MyFavouritesViewController: FavouritesStackListTableViewCellDelegate {
     func didSwipeCard(with card: StackCard?, direction: CardSwipeDirection) {
         if let card {
-            viewModel?.updateWishList(id: card.stackId ?? "", operation: direction.operation)
+            viewModel?.updateWishList(id: card.stackId ?? "", operation: direction.operation, didSwipe: true)
         }
     }
 }

@@ -16,13 +16,7 @@ protocol FavouritesStackListTableViewCellDelegate: AnyObject {
 final class FavouritesStackListTableViewCell: UITableViewCell {
     // MARK: - Outlets
     @IBOutlet private weak var containerStackView: UIStackView!
-    @IBOutlet private weak var iconImageView: UIImageView!
-    @IBOutlet private weak var titleStackView: UIStackView!
-    @IBOutlet private weak var titleLabel: UILabel!
-    @IBOutlet private weak var messageLabel: UILabel!
-    @IBOutlet private weak var badgeLabel: UILabel!
-    @IBOutlet private weak var badgeView: UIView!
-    @IBOutlet private weak var stackContainerView: UIView!
+    @IBOutlet private weak var stackContainerView: StackContainerView!
     
     // MARK: - Properties
     weak var delegate: FavouritesStackListTableViewCellDelegate?
@@ -33,7 +27,6 @@ final class FavouritesStackListTableViewCell: UITableViewCell {
     // MARK: - Lifecycle
     override func awakeFromNib() {
         super.awakeFromNib()
-        setupUI()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -41,41 +34,15 @@ final class FavouritesStackListTableViewCell: UITableViewCell {
     }
     
     // MARK: - Methods
-    private func setupUI() {
-        iconImageView.backgroundColor = .clear
-        
-        titleLabel.fontTextStyle = .smilesHeadline2
-        titleLabel.textColor = .primaryLabelTextColor
-        
-        messageLabel.fontTextStyle = .smilesTitle2
-        messageLabel.textColor = .secondaryLabelTextColor
-        
-        badgeLabel.addMaskedCorner(withMaskedCorner: [.layerMaxXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMinXMinYCorner], cornerRadius: badgeLabel.bounds.height / 2)
-        badgeLabel.fontTextStyle = .smilesTitle3
-        badgeLabel.textColor = .white
-        
-        containerStackView.setCustomSpacing(24, after: iconImageView)
-        containerStackView.setCustomSpacing(56, after: titleStackView)
-    }
-    
-    func configureCell(with viewModel: ViewModel) {
+    func configureCell(with viewModel: ViewModel, shouldSkeleton: Bool) {
         delegate = viewModel.delegate
-        iconImageView.image = UIImage(resource: viewModel.iconImage ?? .favouritesEmptyIcon)
-        titleLabel.text = viewModel.title
-        messageLabel.text = viewModel.message
-        
-        if (viewModel.badgeCount ?? 0) > 0 {
-            badgeView.isHidden = false
-            badgeLabel.text = "\(viewModel.badgeCount ?? 0)"
-        } else {
-            badgeView.isHidden = true
-        }
         
         swipeCards = viewModel.swipeCards ?? []
         stackListType = viewModel.stackListType
         
         stackContainerView.addSubview(stackContainer)
         stackContainer.frame = stackContainerView.bounds
+        stackContainer.setShouldSkeleton(shouldSkeleton: shouldSkeleton)
         stackContainer.delegate = self
         stackContainer.dataSource = self
     }
@@ -84,10 +51,6 @@ final class FavouritesStackListTableViewCell: UITableViewCell {
 // MARK: ViewModel
 extension FavouritesStackListTableViewCell {
     struct ViewModel {
-        let iconImage: ImageResource?
-        let title: String?
-        let message: String?
-        let badgeCount: Int?
         let swipeCards: [StackCard]?
         let stackListType: StackListType
         let delegate: FavouritesStackListTableViewCellDelegate?

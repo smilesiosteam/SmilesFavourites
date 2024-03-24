@@ -31,6 +31,12 @@ final class MyFavouritesViewModel {
     var removeFavouriteData: Any?
     var removeIndexPath: IndexPath?
     var lastRemoveId: String?
+    var badgeCount = 0
+    var swipeCount = 0
+    var hasStackList = false
+    var hasFavourites = false
+    var sections = [SmilesFavouritesSectionData(index: 0, identifier: .swipeMessage), SmilesFavouritesSectionData(index: 1, identifier: .stackList), SmilesFavouritesSectionData(index: 2, identifier: .favouritesList)]
+    var didUpdateSwipeMessage = false
     
     // MARK: - Init
     init(useCase: StackListUseCaseProtocol, wishListUseCase: WishListUseCaseProtocol, favouritesVoucherUseCase: FavouriteVoucherUseCase, favouriteFoodUseCase: FavouriteFoodUseCase) {
@@ -51,8 +57,6 @@ final class MyFavouritesViewModel {
                 case .getStackListDidSucceed(let response):
                     self.statusSubject.send(.stackList(response: response))
                 }
-                
-                self.getFavourites()
             }
             .store(in: &cancellables)
     }
@@ -66,7 +70,7 @@ final class MyFavouritesViewModel {
         }
     }
     
-    func updateWishList(id: String, operation: Int) {
+    func updateWishList(id: String, operation: Int, didSwipe: Bool = false) {
         lastRemoveId = id
         if stackListType == .voucher {
             wishListUseCase.updateOfferWishListStatus(offerId: id, operation: operation)
@@ -77,7 +81,15 @@ final class MyFavouritesViewModel {
                     case .updateWishListDidFail(let message):
                         self.statusSubject.send(.showError(message: message))
                     case .updateWishListStatusDidSucceed(let response):
-                        self.statusSubject.send(.updateWishList(response: response))
+                        if operation == 1 {
+                            self.badgeCount += 1
+                        }
+                        
+                        if didSwipe {
+                            self.swipeCount += 1
+                        }
+                        
+                        self.statusSubject.send(.updateWishList(response: response, operation: operation))
                     }
                 }
                 .store(in: &cancellables)
@@ -90,7 +102,15 @@ final class MyFavouritesViewModel {
                     case .updateWishListDidFail(let message):
                         self.statusSubject.send(.showError(message: message))
                     case .updateWishListStatusDidSucceed(let response):
-                        self.statusSubject.send(.updateWishList(response: response))
+                        if operation == 1 {
+                            self.badgeCount += 1
+                        }
+                        
+                        if didSwipe {
+                            self.swipeCount += 1
+                        }
+                        
+                        self.statusSubject.send(.updateWishList(response: response, operation: operation))
                     }
                 }
                 .store(in: &cancellables)
@@ -178,7 +198,7 @@ extension MyFavouritesViewModel {
     enum State {
         case showError(message: String)
         case stackList(response: FavouriteStackListResponse)
-        case updateWishList(response: WishListResponseModel)
+        case updateWishList(response: WishListResponseModel, operation: Int)
         case favouriteVoucher(response: FavouriteVoucherResponse)
         case favouriteFood(response: FavouriteFoodResponse)
     }

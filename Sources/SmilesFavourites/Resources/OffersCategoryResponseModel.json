@@ -1,0 +1,53 @@
+{
+    "extTransactionId": "3735486463367",
+    "offers": [
+        {
+            "offerTitle": "Prayer time AZAN & DUA",
+            "offerDescription": "Prayer time AZAN & DUA bundle Free for a month",
+            "pointsValue": "0",
+            "dirhamValue": "0",
+            "categoryId": "8",
+            "imageURL": "https://www.SmilesUAE.ae/images/APP/OFFERS/SMALL_HORIZONTAL/NEW/OF_12478_OF_7885_RBT_SALATI.jpg?1671794237382",
+            "categoryOrder": 1,
+            "partnerName": "Etisalat",
+            "isWishlisted": false,
+            "partnerImage": "https://www.SmilesUAE.ae/images/APP/PARTNERS/LISTING/ES.jpg?1671794237382",
+            "cinemaOfferFlag": false,
+            "voucherPromoText": "Caller Tunes",
+            "recommendationModel": "offer"
+        },
+        {
+            "offerTitle": "Get 3 Flexi minutes",
+            "offerDescription": "Get 3 Flexi minutes",
+            "pointsValue": "100",
+            "dirhamValue": "1",
+            "categoryId": "8",
+            "imageURL": "https://www.SmilesUAE.ae/images/APP/OFFERS/SMALL_HORIZONTAL/NEW/OF_1358_DOD_LOY_3FLEXI.jpg?1671794237382",
+            "categoryOrder": 1,
+            "partnerName": "Minutes Deal",
+            "isWishlisted": false,
+            "partnerImage": "https://www.SmilesUAE.ae/images/APP/PARTNERS/LISTING/ES_MD.jpg?1671794237382",
+            "cinemaOfferFlag": false,
+            "recommendationModel": "offer"
+        },
+        {
+            "offerTitle": "150 MB Prepaid Daily Data Plan",
+            "offerDescription": "150 MB Prepaid Daily Data Plan",
+            "pointsValue": "400",
+            "dirhamValue": "4",
+            "categoryId": "8",
+            "imageURL": "https://www.SmilesUAE.ae/images/APP/OFFERS/SMALL_HORIZONTAL/NEW/OF_7737_AR150MB.jpg?1671794237382",
+            "categoryOrder": 1,
+            "partnerName": "Data Package",
+            "isWishlisted": false,
+            "partnerImage": "https://www.SmilesUAE.ae/images/APP/PARTNERS/LISTING/ES_DP.jpg?1671794237382",
+            "cinemaOfferFlag": false,
+            "voucherPromoText": "150 MB Daily data plan valid for 24 hours from date of activation 2",
+            "recommendationModel": "offer"
+        },
+        
+    ],
+    "featuredOffers": [],
+    "lifestyleSubscriberFlag": false,
+    "offersCount": 39
+}

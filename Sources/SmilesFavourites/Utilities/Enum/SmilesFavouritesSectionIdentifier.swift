@@ -11,6 +11,7 @@ import SmilesUtilities
 enum SmilesFavouritesSectionIdentifier: String, SectionIdentifierProtocol {
     var identifier: String { return self.rawValue }
     
+    case swipeMessage
     case stackList
     case favouritesList
 }

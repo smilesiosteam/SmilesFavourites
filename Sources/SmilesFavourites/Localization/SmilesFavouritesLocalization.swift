@@ -22,6 +22,10 @@ enum SmilesFavouritesLocalization {
     case favourites
     case removedFromFavouritesTitle
     case undoTitle
+    case swipeToAddToFavouritesMessage
+    case addedToTheListMessage
+    case greatJobMessage
+    case findYouMoreFavesMessage
     
     var text: String {
         switch self {
@@ -51,6 +55,14 @@ enum SmilesFavouritesLocalization {
             return "RemovedFromFavouritesTitle".localizedString
         case .undoTitle:
             return "UndoTitle".localizedString
+        case .swipeToAddToFavouritesMessage:
+            return "SwipeToAddToFavouritesMessage".localizedString
+        case .addedToTheListMessage:
+            return "AddedToTheListMessage".localizedString
+        case .greatJobMessage:
+            return "GreatJobMessage".localizedString
+        case .findYouMoreFavesMessage:
+            return "FindYouMoreFavesMessage".localizedString
         }
     }
 }

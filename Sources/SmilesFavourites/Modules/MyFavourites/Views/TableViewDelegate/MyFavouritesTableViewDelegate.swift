@@ -18,8 +18,10 @@ final class MyFavouritesTableViewDelegate: NSObject, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch sections[indexPath.section].identifier {
+        case .swipeMessage:
+            debugPrint("Tapped swipe message")
         case .stackList:
-            print("Tapped stack list")
+            debugPrint("Tapped stack list")
         case .favouritesList:
             statusSubject.send(.didSelectRow(indexPath: indexPath))
             break
