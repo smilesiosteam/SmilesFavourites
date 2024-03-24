@@ -51,7 +51,7 @@ final class FavouriteVoucherUseCase: FavouriteVoucherUseCaseProtocol {
 }
 
 extension FavouriteVoucherUseCase {
-    enum State {
+    enum State: Equatable {
         case getFavouriteVoucherDidFail(message: String)
         case getFavouriteVoucherDidSucceed(response: FavouriteVoucherResponse)
     }

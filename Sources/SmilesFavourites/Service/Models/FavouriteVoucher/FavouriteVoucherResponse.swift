@@ -10,7 +10,11 @@ import NetworkingLayer
 import SmilesUtilities
 import SmilesOffers
 
-class FavouriteVoucherResponse: BaseMainResponse {
+class FavouriteVoucherResponse: BaseMainResponse, Equatable {
+    static func == (lhs: FavouriteVoucherResponse, rhs: FavouriteVoucherResponse) -> Bool {
+        lhs.offers?.count == rhs.offers?.count && lhs.featuredOffers?.count == rhs.featuredOffers?.count && lhs.offersCount == rhs.offersCount
+    }
+    
     
     var featuredOffers: [OfferDO]?
     var offers: [OfferDO]?
@@ -33,5 +37,9 @@ class FavouriteVoucherResponse: BaseMainResponse {
         offersCount = try values.decodeIfPresent(Int.self, forKey: .offersCount)
         
         try super.init(from: decoder)
+    }
+    
+    override init() {
+        super.init()
     }
 }
