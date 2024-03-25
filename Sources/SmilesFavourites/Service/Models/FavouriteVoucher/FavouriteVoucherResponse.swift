@@ -11,11 +11,6 @@ import SmilesUtilities
 import SmilesOffers
 
 class FavouriteVoucherResponse: BaseMainResponse, Equatable {
-    static func == (lhs: FavouriteVoucherResponse, rhs: FavouriteVoucherResponse) -> Bool {
-        lhs.offers?.count == rhs.offers?.count && lhs.featuredOffers?.count == rhs.featuredOffers?.count && lhs.offersCount == rhs.offersCount
-    }
-    
-    
     var featuredOffers: [OfferDO]?
     var offers: [OfferDO]?
     var lifestyleSubscriberFlag: Bool?
@@ -41,5 +36,9 @@ class FavouriteVoucherResponse: BaseMainResponse, Equatable {
     
     override init() {
         super.init()
+    }
+    
+    static func == (lhs: FavouriteVoucherResponse, rhs: FavouriteVoucherResponse) -> Bool {
+        lhs.offers?.count == rhs.offers?.count && lhs.featuredOffers?.count == rhs.featuredOffers?.count && lhs.offersCount == rhs.offersCount
     }
 }

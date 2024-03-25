@@ -1,0 +1,38 @@
+{
+    "restaurants" : [
+        {
+            "openingTime" : "25 Mar 2024 04:00 AM",
+            "location" : "Downtown Dubai",
+            "isVirtualRestaurant" : false,
+            "deliveryCharges" : 0,
+            "ratingCount" : 0,
+            "isRestInfo" : false,
+            "totalPoints" : 0,
+            "tempClosed" : false,
+            "isFavoriteRestaurant" : false,
+            "imageUrl" : "https:\/\/cdn.eateasily.com\/restaurants\/profile\/app\/400X300\/12254.jpg",
+            "restaurantName" : "Operation Falafel",
+            "iconUrl" : "https:\/\/cdn.eateasily.com\/restaurants\/f7d050303871d106ed1c35638e06fa3c\/12258_small.jpg",
+            "liveTracking" : true,
+            "cuisines" : [
+                "Arabic",
+                "Lebanese",
+                "Middle Eastern"
+            ],
+            "imageUrlLarge" : "https:\/\/cdn.eateasily.com\/restaurants\/profile\/app\/400X300\/12254.jpg",
+            "deliveryTime" : 45,
+            "amountPerPerson" : 30,
+            "closingTime" : "25 Mar 2024 04:00 AM",
+            "isFoodSubscription" : false,
+            "restaurantId" : "12258",
+            "isBogo" : false,
+            "recommendationModelEvent" : "RESTAURANT_FOR_YOU",
+            "restaurantStatus" : true,
+            "deliveryTimeRange" : "45-55",
+            "restaurantRating" : 0,
+            "minimumOrder" : 0,
+            "restaurantDistance" : 0.91000000000000003
+        }
+    ],
+    "extTransactionId" : "5172546259455"
+}
