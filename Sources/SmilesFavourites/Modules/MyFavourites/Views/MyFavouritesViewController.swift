@@ -328,7 +328,7 @@ public class MyFavouritesViewController: UIViewController {
                             self?.viewModel?.removeFavouriteData = vouchers?.models?[indexPath.row]
                             self?.viewModel?.removeIndexPath = indexPath
                             (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<OfferDO>)?.models?.remove(at: indexPath.row)
-                            self?.tableView.reloadData()
+                            self?.tableView.reloadSections([index], with: .automatic)
                         }
                     }
                 })
@@ -360,7 +360,7 @@ public class MyFavouritesViewController: UIViewController {
                             self?.viewModel?.removeFavouriteData = foods?.models?[indexPath.row]
                             self?.viewModel?.removeIndexPath = indexPath
                             (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?.remove(at: indexPath.row)
-                            self?.tableView.reloadData()
+                            self?.tableView.reloadSections([index], with: .automatic)
                         }
                     }
                 })
