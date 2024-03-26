@@ -10,7 +10,7 @@ import NetworkingLayer
 import SmilesUtilities
 import SmilesOffers
 
-class FavouriteFoodResponse: BaseMainResponse {
+class FavouriteFoodResponse: BaseMainResponse, Equatable {
     var restaurants: [Restaurant]?
     
     enum CodingKeys: String, CodingKey {
@@ -23,5 +23,13 @@ class FavouriteFoodResponse: BaseMainResponse {
         restaurants = try values.decodeIfPresent([Restaurant].self, forKey: .restaurants)
 
         try super.init(from: decoder)
+    }
+    
+    override init() {
+        super.init()
+    }
+    
+    static func == (lhs: FavouriteFoodResponse, rhs: FavouriteFoodResponse) -> Bool {
+        return lhs.restaurants?.count == rhs.restaurants?.count
     }
 }

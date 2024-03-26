@@ -49,7 +49,7 @@ final class FavouriteFoodUseCase: FavouriteFoodUseCaseProtocol {
 }
 
 extension FavouriteFoodUseCase {
-    enum State {
+    enum State: Equatable {
         case getFavouriteFoodDidFail(message: String)
         case getFavouriteFoodDidSucceed(response: FavouriteFoodResponse)
     }
