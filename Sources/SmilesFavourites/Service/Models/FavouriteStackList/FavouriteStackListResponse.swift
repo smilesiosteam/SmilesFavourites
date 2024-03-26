@@ -30,7 +30,7 @@ struct StackCard: Codable {
     let stackPointsValue: String?
     let stackDirhamValue: String?
     let stackPartnerImage: String?
-    let minimumOrder: String?
+    let minimumOrder: Double?
     let cuisine: String?
     let restaurantImage: String?
     let deliveryCharges: Double?
@@ -60,7 +60,7 @@ struct StackCard: Codable {
         self.stackPointsValue = try container.decodeIfPresent(String.self, forKey: .stackPointsValue)
         self.stackDirhamValue = try container.decodeIfPresent(String.self, forKey: .stackDirhamValue)
         self.stackPartnerImage = try container.decodeIfPresent(String.self, forKey: .stackPartnerImage)
-        self.minimumOrder = try container.decodeIfPresent(String.self, forKey: .minimumOrder)
+        self.minimumOrder = try container.decodeIfPresent(Double.self, forKey: .minimumOrder)
         self.cuisine = try container.decodeIfPresent(String.self, forKey: .cuisine)
         self.deliveryCharges = try container.decodeIfPresent(Double.self, forKey: .deliveryCharges)
         self.perPerson = try container.decodeIfPresent(Double.self, forKey: .perPerson)

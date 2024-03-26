@@ -57,8 +57,10 @@ final class MyFavouritesViewModel {
                 case .getStackListDidSucceed(let response):
                     self.statusSubject.send(.stackList(response: response))
                 }
+                
+                self.getFavourites()
             }
-            .store(in: &cancellables)
+        .store(in: &cancellables)
     }
     
     func getFavourites() {
@@ -70,10 +72,10 @@ final class MyFavouritesViewModel {
         }
     }
     
-    func updateWishList(id: String, operation: Int, didSwipe: Bool = false) {
+    func updateWishList(id: String, operation: FavouriteOperation, didSwipe: Bool = false) {
         lastRemoveId = id
         if stackListType == .voucher {
-            wishListUseCase.updateOfferWishListStatus(offerId: id, operation: operation)
+            wishListUseCase.updateOfferWishListStatus(offerId: id, operation: operation.rawValue)
                 .sink { [weak self] state in
                     guard let self else { return }
                     
@@ -81,7 +83,7 @@ final class MyFavouritesViewModel {
                     case .updateWishListDidFail(let message):
                         self.statusSubject.send(.showError(message: message))
                     case .updateWishListStatusDidSucceed(let response):
-                        if operation == 1 {
+                        if operation == .add {
                             self.badgeCount += 1
                         }
                         
@@ -92,9 +94,9 @@ final class MyFavouritesViewModel {
                         self.statusSubject.send(.updateWishList(response: response, operation: operation))
                     }
                 }
-                .store(in: &cancellables)
+            .store(in: &cancellables)
         } else {
-            wishListUseCase.updateRestaurantWishListStatus(restaurantId: id, operation: operation)
+            wishListUseCase.updateRestaurantWishListStatus(restaurantId: id, operation: operation.rawValue)
                 .sink { [weak self] state in
                     guard let self else { return }
                     
@@ -102,7 +104,7 @@ final class MyFavouritesViewModel {
                     case .updateWishListDidFail(let message):
                         self.statusSubject.send(.showError(message: message))
                     case .updateWishListStatusDidSucceed(let response):
-                        if operation == 1 {
+                        if operation == .add {
                             self.badgeCount += 1
                         }
                         
@@ -113,7 +115,7 @@ final class MyFavouritesViewModel {
                         self.statusSubject.send(.updateWishList(response: response, operation: operation))
                     }
                 }
-                .store(in: &cancellables)
+            .store(in: &cancellables)
         }
     }
     
@@ -138,7 +140,7 @@ final class MyFavouritesViewModel {
                         self.statusSubject.send(.favouriteVoucher(response: response))
                     }
                 }
-                .store(in: &self.cancellables)
+            .store(in: &self.cancellables)
         }
     }
     
@@ -154,7 +156,7 @@ final class MyFavouritesViewModel {
                     self.statusSubject.send(.favouriteFood(response: response))
                 }
             }
-            .store(in: &self.cancellables)
+        .store(in: &self.cancellables)
     }
     
     func undoFavourites() {
@@ -185,12 +187,19 @@ final class MyFavouritesViewModel {
     func removeFromFavourites() {
         if let offerData = self.removeFavouriteData as? OfferDO,
             let offerId = offerData.offerId {
-            self.updateWishList(id: offerId, operation: 2)
+            self.updateWishList(id: offerId, operation: .remove)
         }
         else if let foodData = self.removeFavouriteData as? Restaurant,
                 let restaurantId = foodData.restaurantId {
-            self.updateWishList(id: restaurantId, operation: 2)
+            self.updateWishList(id: restaurantId, operation: .remove)
         }
+    }
+    
+    func resetStackListState() {
+        badgeCount = 0
+        swipeCount = 0
+        hasStackList = false
+        hasFavourites = false
     }
 }
 
@@ -198,7 +207,7 @@ extension MyFavouritesViewModel {
     enum State {
         case showError(message: String)
         case stackList(response: FavouriteStackListResponse)
-        case updateWishList(response: WishListResponseModel, operation: Int)
+        case updateWishList(response: WishListResponseModel, operation: FavouriteOperation)
         case favouriteVoucher(response: FavouriteVoucherResponse)
         case favouriteFood(response: FavouriteFoodResponse)
     }

@@ -45,6 +45,8 @@ final class FavouritesStackListTableViewCell: UITableViewCell {
         stackContainer.setShouldSkeleton(shouldSkeleton: shouldSkeleton)
         stackContainer.delegate = self
         stackContainer.dataSource = self
+        
+        contentView.isUserInteractionEnabled = shouldSkeleton ? false : true
     }
 }
 
