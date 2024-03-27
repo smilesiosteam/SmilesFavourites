@@ -67,6 +67,7 @@ public class MyFavouritesViewController: UIViewController {
         setupCollectionView()
         bindTableViewDelegate()
         setupTableView()
+        setupNotifications()
     }
     
     // MARK: - Private Helper Methods
@@ -135,9 +136,34 @@ public class MyFavouritesViewController: UIViewController {
         self.navigationController?.navigationBar.prefersLargeTitles = false
     }
     
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(self,
+              selector: #selector(applicationWillTerminate(notification:)),
+              name: UIApplication.willTerminateNotification,
+              object: nil)
+        NotificationCenter.default.addObserver(self,
+              selector: #selector(applicationwillResignActiveNotification(notification:)),
+              name: UIApplication.willResignActiveNotification,
+              object: nil)
+    }
+    
     @objc func onClickBack() {
         self.navigationController?.popViewController(animated: true)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
+    @objc func applicationWillTerminate(notification: Notification) {
+        self.removeSnackbar()
+        self.viewModel?.removeFromFavourites()
+    }
+
+    @objc func applicationwillResignActiveNotification(notification: Notification) {
+        self.removeSnackbar()
+        self.viewModel?.removeFromFavourites()
+    }
+    
+    deinit {
+      NotificationCenter.default.removeObserver(self)
     }
     
     private func configureDataSource() {
