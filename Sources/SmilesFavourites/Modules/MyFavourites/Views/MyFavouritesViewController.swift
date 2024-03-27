@@ -10,10 +10,12 @@ import UIKit
 import Combine
 import SmilesUtilities
 import SmilesOffers
+import SmilesLocationHandler
 
 public protocol MyFavouritesViewControllerDelegate: AnyObject {
     func didSelectVoucher(voucherData: OfferDO)
     func didSelectFood(foodData: Restaurant)
+    func didCheckLocation(enable: Bool)
 }
 
 public class MyFavouritesViewController: UIViewController {
@@ -178,6 +180,9 @@ public class MyFavouritesViewController: UIViewController {
                 if viewModel?.stackListType == .food {
                     self.configureFavouriteFood(with: response)
                 }
+                
+            case .checkLocation(let enable):
+                self.delegate?.didCheckLocation(enable: enable)
             }
         }.store(in: &cancellables)
     }
@@ -197,6 +202,12 @@ public class MyFavouritesViewController: UIViewController {
                     
                     self.resetTableViewDataSource()
                     self.configureSections()
+                }
+                
+            case .showLocationPopup:
+                if let topVC = UIApplication.getTopViewController() {
+                    SmilesLocationRouter.shared.navigationController = topVC.navigationController
+                    SmilesLocationRouter.shared.showDetectLocationPopup(from: topVC, controllerType: .detectLocation)
                 }
             }
         }.store(in: &cancellables)

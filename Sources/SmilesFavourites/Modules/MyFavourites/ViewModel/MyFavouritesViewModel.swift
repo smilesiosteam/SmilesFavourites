@@ -122,12 +122,12 @@ final class MyFavouritesViewModel {
     func getFavouriteVoucher() {
         LocationManager.shared.getLocation { location, _ in
             //            self.updatedLocation = location
-            //            if let _ = location {
-            //                CommonMethods.fireEvent(withTag: "location_enabled")
-            //            }
-            //            else {
-            //                CommonMethods.fireEvent(withTag: "location_disabled")
-            //            }
+            if let _ = location {
+                self.statusSubject.send(.checkLocation(enable: true))
+            }
+            else {
+                self.statusSubject.send(.checkLocation(enable: false))
+            }
             
             self.favouritesVoucherUseCase.getFavouriteVoucher(withCurrentLocation: location, pageNumber: self.pageNumber)
                 .sink { [weak self] state in
@@ -210,5 +210,6 @@ extension MyFavouritesViewModel {
         case updateWishList(response: WishListResponseModel, operation: FavouriteOperation)
         case favouriteVoucher(response: FavouriteVoucherResponse)
         case favouriteFood(response: FavouriteFoodResponse)
+        case checkLocation(enable: Bool)
     }
 }
