@@ -10,13 +10,14 @@ import SmilesTests
 @testable import SmilesFavourites
 
 enum StackListStub {
-    static var getFavouriteStackListFoodModel: FavouriteStackListResponse {
-        let model: FavouriteStackListResponse? = readJsonFile("StackList_Food_Model", bundle: .module)
-        return model ?? .init()
-    }
-    
-    static var getFavouriteStackListVoucherModel: FavouriteStackListResponse {
-        let model: FavouriteStackListResponse? = readJsonFile("StackList_Voucher_Model", bundle: .module)
-        return model ?? .init()
+    static func getFavouriteStackListModel(type: StackListType) -> FavouriteStackListResponse {
+        if type == .voucher {
+            let model: FavouriteStackListResponse? = readJsonFile("StackList_Voucher_Model", bundle: .module)
+            return model ?? .init()
+        }
+        else {
+            let model: FavouriteStackListResponse? = readJsonFile("StackList_Food_Model", bundle: .module)
+            return model ?? .init()
+        }
     }
 }

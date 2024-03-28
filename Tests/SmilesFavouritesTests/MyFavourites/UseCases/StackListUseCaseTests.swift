@@ -28,9 +28,9 @@ final class StackListUseCaseTests: XCTestCase {
     // MARK: - Tests
     func test_stackList_food_successResponse() throws {
         // Given
-        let model = StackListStub.getFavouriteStackListFoodModel
-        services.favouriteStackListResponse = .success(model)
         let type = StackListType.food
+        let model = StackListStub.getFavouriteStackListModel(type: type)
+        services.favouriteStackListResponse = .success(model)
         // When
         let publisher = sut.getStackList(type: type)
         let result = try awaitPublisher(publisher)
@@ -42,9 +42,9 @@ final class StackListUseCaseTests: XCTestCase {
     
     func test_stackList_voucher_successResponse() throws {
         // Given
-        let model = StackListStub.getFavouriteStackListVoucherModel
-        services.favouriteStackListResponse = .success(model)
         let type = StackListType.voucher
+        let model = StackListStub.getFavouriteStackListModel(type: type)
+        services.favouriteStackListResponse = .success(model)
         // When
         let publisher = sut.getStackList(type: type)
         let result = try awaitPublisher(publisher)

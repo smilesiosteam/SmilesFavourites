@@ -23,8 +23,8 @@ final class MyFavouritesViewModel {
     
     private let stackListUseCase: StackListUseCaseProtocol
     private let wishListUseCase: WishListUseCaseProtocol
-    private let favouritesVoucherUseCase: FavouriteVoucherUseCase
-    private let favouritesFoodUseCase: FavouriteFoodUseCase
+    private let favouritesVoucherUseCase: FavouriteVoucherUseCaseProtocol
+    private let favouritesFoodUseCase: FavouriteFoodUseCaseProtocol
     let arraySegments = [SmilesFavouritesLocalization.vouchersTitle.text, SmilesFavouritesLocalization.foodTitle.text]
     var stackListType: StackListType = .voucher
     var pageNumber = 1
@@ -39,7 +39,7 @@ final class MyFavouritesViewModel {
     var didUpdateSwipeMessage = false
     
     // MARK: - Init
-    init(useCase: StackListUseCaseProtocol, wishListUseCase: WishListUseCaseProtocol, favouritesVoucherUseCase: FavouriteVoucherUseCase, favouriteFoodUseCase: FavouriteFoodUseCase) {
+    init(useCase: StackListUseCaseProtocol, wishListUseCase: WishListUseCaseProtocol, favouritesVoucherUseCase: FavouriteVoucherUseCaseProtocol, favouriteFoodUseCase: FavouriteFoodUseCaseProtocol) {
         self.stackListUseCase = useCase
         self.wishListUseCase = wishListUseCase
         self.favouritesVoucherUseCase = favouritesVoucherUseCase
