@@ -1,0 +1,25 @@
+{
+    "stackList" : [
+        {
+            "stackTitle" : "Behrouz Biryani",
+            "perPerson" : 43,
+            "rating" : 5,
+            "minOrder" : 0,
+            "stackId" : "2849",
+            "restaurantImage" : "https:\/\/cdn.eateasily.com\/restaurants\/profile\/app\/400X300\/2842.jpg?v=28032024",
+            "cuisine" : "Biryani, Indian, North Indian",
+            "deliveryCharges" : 0
+        },
+        {
+            "stackTitle" : "TGI Friday's",
+            "perPerson" : 50,
+            "rating" : 0,
+            "minOrder" : 0,
+            "stackId" : "15037",
+            "restaurantImage" : "https:\/\/cdn.eateasily.com\/restaurants\/profile\/app\/400X300\/15034.jpg?v=28032024",
+            "cuisine" : "American, Burger, Sandwiches",
+            "deliveryCharges" : 7
+        }
+    ],
+    "extTransactionId" : "3359059972474"
+}

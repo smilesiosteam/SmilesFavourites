@@ -42,7 +42,6 @@ final class FavouriteFoodUseCaseTests: XCTestCase {
         // Given
         let error = "Server error"
         services.favouriteFoodResponse = .failure(.badURL(error))
-        let pageNumber = 1
         // When
         let publisher = sut.getFavouriteFood()
         let result = try awaitPublisher(publisher)

@@ -44,7 +44,7 @@ final class StackListUseCase: StackListUseCaseProtocol {
 }
 
 extension StackListUseCase {
-    enum State {
+    enum State: Equatable {
         case getStackListDidFail(message: String)
         case getStackListDidSucceed(response: FavouriteStackListResponse)
     }

@@ -438,7 +438,7 @@ public class MyFavouritesViewController: UIViewController {
                 self.dataSource?.dataSources?[index] = TableViewDataSource.make(forFavouriteFood: foodList, data: "#FFFFFF", completion: { [weak self] isFavorite, restaurantId, indexPath in
                     
                     if let indexPath = indexPath {
-                        if !(self?.showPopupIfLocationNil() ?? true) {
+                        if !(self?.showPopupIfLocationNil() ?? false) {
                             if let foods = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>? {
                                 self?.viewModel?.removeFromFavourites()
                                 self?.showSnackbar()

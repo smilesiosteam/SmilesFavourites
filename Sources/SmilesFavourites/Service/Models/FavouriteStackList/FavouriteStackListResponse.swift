@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct FavouriteStackListResponse: Codable {
+struct FavouriteStackListResponse: Codable, Equatable {
     // MARK: - Properties
     let stackList: [StackCard]?
     
@@ -20,6 +20,14 @@ struct FavouriteStackListResponse: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.stackList = try container.decodeIfPresent([StackCard].self, forKey: .stackList)
+    }
+    
+    init() {
+        stackList = []
+    }
+    
+    static func == (lhs: FavouriteStackListResponse, rhs: FavouriteStackListResponse) -> Bool {
+        return lhs.stackList?.count == rhs.stackList?.count
     }
 }
 
