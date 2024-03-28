@@ -229,12 +229,6 @@ public class MyFavouritesViewController: UIViewController {
                     self.resetTableViewDataSource()
                     self.configureSections()
                 }
-                
-            case .showLocationPopup:
-                if let topVC = UIApplication.getTopViewController() {
-                    SmilesLocationRouter.shared.navigationController = topVC.navigationController
-                    SmilesLocationRouter.shared.showDetectLocationPopup(from: topVC, controllerType: .detectLocation)
-                }
             }
         }.store(in: &cancellables)
     }
@@ -252,7 +246,9 @@ public class MyFavouritesViewController: UIViewController {
                 }
                 else {
                     if let foodItem = (self.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?[safe: indexPath.row] as? Restaurant {
-                        self.delegate?.didSelectFood(foodData: foodItem)
+                        if !self.showPopupIfLocationNil() {
+                            self.delegate?.didSelectFood(foodData: foodItem)
+                        }
                     }
                 }
             }
@@ -326,6 +322,17 @@ public class MyFavouritesViewController: UIViewController {
         }
     }
     
+    private func showPopupIfLocationNil() -> Bool {
+        if LocationStateSaver().checkIfLatLongIsNil() {
+            if let topVC = UIApplication.getTopViewController() {
+                SmilesLocationRouter.shared.navigationController = topVC.navigationController
+                SmilesLocationRouter.shared.showDetectLocationPopup(from: topVC, controllerType: .detectLocation)
+                return true
+            }
+        }
+        return false
+    }
+    
     // MARK: - Private TableView Configure Methods
     private func configureSwipeMessage(with viewModel: SwipeMessageViewModel) {
         if let index = getSectionIndex(for: .swipeMessage) {
@@ -343,6 +350,10 @@ public class MyFavouritesViewController: UIViewController {
         } else if (viewModel?.hasStackList ?? false) && (viewModel?.hasFavourites ?? false) {
             let swipeMessageState = SwipeMessageState.swipeToAddToFavouritesWithoutSwipe.state
             let viewModel = SwipeMessageViewModel(iconImage: swipeMessageState.icon, title: swipeMessageState.title, message: swipeMessageState.message, badgeCount: 0)
+            configureSwipeMessage(with: viewModel)
+        } else if !(viewModel?.hasStackList ?? false) && !(viewModel?.hasFavourites ?? false) {
+            let swipeMessageState = SwipeMessageState.favouritesListEmpty.state
+            let viewModel = SwipeMessageViewModel(iconImage: swipeMessageState.icon, title: swipeMessageState.title, message: "", badgeCount: 0)
             configureSwipeMessage(with: viewModel)
         } else {
             configureHideSection(for: .swipeMessage, dataSource: SwipeMessageViewModel.self)
@@ -427,13 +438,15 @@ public class MyFavouritesViewController: UIViewController {
                 self.dataSource?.dataSources?[index] = TableViewDataSource.make(forFavouriteFood: foodList, data: "#FFFFFF", completion: { [weak self] isFavorite, restaurantId, indexPath in
                     
                     if let indexPath = indexPath {
-                        if let foods = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>? {
-                            self?.viewModel?.removeFromFavourites()
-                            self?.showSnackbar()
-                            self?.viewModel?.removeFavouriteData = foods?.models?[indexPath.row]
-                            self?.viewModel?.removeIndexPath = indexPath
-                            (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?.remove(at: indexPath.row)
-                            self?.tableView.reloadSections([index], with: .automatic)
+                        if !(self?.showPopupIfLocationNil() ?? true) {
+                            if let foods = self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>? {
+                                self?.viewModel?.removeFromFavourites()
+                                self?.showSnackbar()
+                                self?.viewModel?.removeFavouriteData = foods?.models?[indexPath.row]
+                                self?.viewModel?.removeIndexPath = indexPath
+                                (self?.dataSource?.dataSources?[safe: indexPath.section] as? TableViewDataSource<Restaurant>)?.models?.remove(at: indexPath.row)
+                                self?.tableView.reloadSections([index], with: .automatic)
+                            }
                         }
                     }
                 })

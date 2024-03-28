@@ -40,12 +40,6 @@ extension SegmentsCollectionViewDataSource: UICollectionViewDataSource, UICollec
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.item == 1 {
-            if LocationStateSaver().checkIfLatLongIsNil() {
-                self.statusSubject.send(.showLocationPopup)
-                return
-            }
-        }
         selectedIndex = indexPath.item
         statusSubject.send(.didSelectItem(index: selectedIndex))
     }
@@ -68,6 +62,5 @@ extension SegmentsCollectionViewDataSource: UICollectionViewDataSource, UICollec
 extension SegmentsCollectionViewDataSource {
     enum State {
         case didSelectItem(index: Int)
-        case showLocationPopup
     }
 }
